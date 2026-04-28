@@ -1,0 +1,3148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookMySalon – Better Booking. Better Business.</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FF6B9A;
+    --peach: #FF9A7A;
+    --orange: #FFB86B;
+    --yellow: #FFD86B;
+    --white: #FFFFFF;
+    --light-grey: #F5F6F8;
+    --border: #E5E7EB;
+    --text: #1F2937;
+    --text-grey: #6B7280;
+    --green: #22C55E;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #F5F6F8; color: #1F2937; }
+  h1,h2,h3 { font-family: 'Playfair Display', serif; }
+  .gradient-brand { background: linear-gradient(135deg, #FF6B9A 0%, #FF9A7A 50%, #FFB86B 100%); }
+  .gradient-text { background: linear-gradient(135deg, #FF6B9A, #FF9A7A, #FFB86B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .btn-primary { background: linear-gradient(135deg, #FF6B9A, #FF9A7A); color: white; border: none; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,107,154,0.35); }
+  .btn-green { background: #22C55E; color: white; font-family: 'DM Sans', sans-serif; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; }
+  .btn-green:hover { background: #16A34A; transform: translateY(-1px); }
+  .card { background: white; border: 1px solid var(--border); border-radius: 16px; transition: all 0.2s; }
+  .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .tag { background: #FFF0F6; color: #FF6B9A; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 500; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .time-slot { border: 1.5px solid #E5E7EB; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; transition: all 0.15s; font-size: 14px; font-weight: 500; background: white; }
+  .time-slot:hover { border-color: #FF6B9A; color: #FF6B9A; }
+  .time-slot.selected { background: linear-gradient(135deg, #FF6B9A, #FF9A7A); color: white; border-color: transparent; }
+  .time-slot.booked { background: #FFF0F6; color: #FF6B9A; cursor: not-allowed; opacity: 0.5; }
+  .time-slot.blocked { background: #F3F4F6; color: #9CA3AF; cursor: not-allowed; }
+  .star { color: #FBBF24; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modal-box { background: white; border-radius: 20px; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; padding: 28px; }
+  .nav-header { background: linear-gradient(135deg, #FF6B9A 0%, #FF9A7A 100%); color: white; padding: 16px 24px; }
+  .salon-avatar { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #FFF0F6, #FFE4ED); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .lang-btn { border: 1.5px solid #E5E7EB; background: transparent; color: #374151; border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .lang-btn.active { background: linear-gradient(135deg, #FF6B9A, #FF9A7A); border-color: transparent; color: white; }
+  input, select, textarea { font-family: 'DM Sans', sans-serif; }
+  .notification { position: fixed; bottom: 24px; right: 24px; z-index: 999; background: white; border-radius: 12px; padding: 14px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border-left: 4px solid #22C55E; font-size: 14px; font-weight: 500; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+  .notification.show { transform: translateY(0); opacity: 1; }
+  .notification.error { border-left-color: #EF4444; }
+  .progress-step { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; transition: all 0.3s; }
+  .progress-step.done { background: linear-gradient(135deg, #FF6B9A, #FF9A7A); color: white; }
+  .progress-step.current { background: white; color: #FF6B9A; border: 2px solid #FF6B9A; }
+  .progress-step.upcoming { background: rgba(255,255,255,0.3); color: rgba(255,255,255,0.6); }
+  .filter-btn { border: 1.5px solid #E5E7EB; border-radius: 24px; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; background: white; color: #374151; }
+  .filter-btn.active { background: linear-gradient(135deg, #FF6B9A, #FF9A7A); color: white; border-color: transparent; }
+  .review-star { color: #D1D5DB; font-size: 20px; cursor: pointer; transition: color 0.1s; }
+  .review-star.active, .review-star:hover { color: #FBBF24; }
+  .badge-vip { background: #FEF3C7; color: #D97706; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+  .badge-deposit { background: #FEE2E2; color: #DC2626; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+  .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.15s; color: #374151; }
+  .sidebar-link:hover { background: #FFF0F6; color: #FF6B9A; }
+  .sidebar-link.active { background: linear-gradient(135deg, #FF6B9A, #FF9A7A); color: white; }
+  .range-input { accent-color: #FF6B9A; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #F5F6F8; } ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .fade-in { animation: fadeIn 0.3s ease forwards; }
+  .photo-thumb { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; background: linear-gradient(135deg, #FFF0F6, #FFE4ED); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+  /* Router pages */
+  .page { display: none; }
+  .page.active { display: block; }
+  /* Top navbar */
+  #top-navbar { position: sticky; top: 0; z-index: 60; background: white; border-bottom: 1px solid #E5E7EB; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .nav-link { color: #374151; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.15s; text-decoration: none; }
+  .nav-link:hover { color: #FF6B9A; }
+  .nav-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: linear-gradient(135deg,#FF6B9A,#FF9A7A); flex-shrink: 0; }
+  /* Auth pages */
+  .auth-card { background: white; border-radius: 20px; padding: 36px; width: 100%; max-width: 420px; border: 1px solid #E5E7EB; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+  .auth-input { width: 100%; border: 1.5px solid #E5E7EB; border-radius: 12px; padding: 12px 16px; font-size: 14px; outline: none; font-family: 'DM Sans',sans-serif; transition: border-color 0.15s; }
+  .auth-input:focus { border-color: #FF6B9A; }
+  /* ---- Landing page ---- */
+  .lp-btn-outline { border: 2px solid #FF6B9A; color: #FF6B9A; background: transparent; padding: 14px 32px; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .lp-btn-outline:hover { background: #FFF0F6; }
+  .lp-mockup { background: white; border-radius: 24px; padding: 28px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(255,107,154,0.18), 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #FFE4ED; }
+  .lp-tslot { border: 1.5px solid #E5E7EB; border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 500; background: white; color: #374151; }
+  .lp-tslot-sel { background: linear-gradient(135deg,#FF6B9A,#FF9A7A); color: white; border-color: transparent; }
+  .lp-tslot-booked { background: #FFF0F6; color: #FF6B9A; opacity: 0.5; }
+  .lp-step-icon { width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg,#FFF0F6,#FFE4ED); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; box-shadow: 0 4px 16px rgba(255,107,154,0.2); }
+  .lp-feat-card { background: white; border-radius: 20px; padding: 28px; border: 1px solid #F3F4F6; transition: all 0.2s; }
+  .lp-feat-card:hover { border-color: #FFB0CC; box-shadow: 0 8px 24px rgba(255,107,154,0.1); transform: translateY(-3px); }
+  .lp-review-card { background: #F9FAFB; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; border: 1px solid #F3F4F6; }
+  .lp-review-card.featured-review { background: linear-gradient(135deg,#FFF0F6,#FFF5EE); border-color: #FFD0E0; }
+  .lp-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#FFF0F6,#FFE4ED); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  /* ---- Owner Dashboard ---- */
+  .od-slot-booked { background: linear-gradient(135deg,#FF6B9A,#FF9A7A); color: white; border-radius: 8px; padding: 4px 6px; font-size: 11px; font-weight: 600; line-height: 1.3; cursor: default; min-height: 36px; display:flex; flex-direction:column; justify-content:center; }
+  .od-slot-blocked { background: #F3F4F6; color: #9CA3AF; border-radius: 8px; padding: 4px 6px; font-size: 11px; text-align:center; cursor: pointer; min-height: 36px; display:flex; align-items:center; justify-content:center; border: 1px dashed #D1D5DB; }
+  .od-slot-blocked:hover { background: #E5E7EB; }
+  .od-slot-free { background: transparent; border-radius: 8px; min-height: 36px; cursor: pointer; border: 1px dashed transparent; transition: all 0.15s; }
+  .od-slot-free:hover { background: #FFF0F6; border-color: #FFB0CC; }
+  .od-day-today { display:inline-flex; width:24px; height:24px; align-items:center; justify-content:center; border-radius:50%; background:linear-gradient(135deg,#FF6B9A,#FF9A7A); color:white; font-size:12px; font-weight:700; }
+  .od-table { border-collapse: collapse; }
+  .od-table th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #F3F4F6; background: #FAFAFA; }
+  .od-table td { padding: 12px 16px; border-bottom: 1px solid #F9FAFB; vertical-align: middle; }
+  .od-table tr:last-child td { border-bottom: none; }
+  .od-table tr:hover td { background: #FAFAFA; }
+  .od-stat-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  /* ---- My Bookings ---- */
+  .mb-tab-bar { display: flex; gap: 4px; background: #F3F4F6; padding: 4px; border-radius: 18px; margin-bottom: 24px; }
+  .mb-tab { flex: 1; padding: 10px 12px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; background: transparent; color: #6B7280; border: none; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .mb-tab.active { background: white; color: #FF6B9A; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  .mb-count { background: #FF6B9A; color: white; border-radius: 999px; font-size: 11px; font-weight: 700; padding: 1px 7px; margin-left: 4px; display: inline-block; vertical-align: middle; }
+  .mb-count.empty { background: #E5E7EB; color: #9CA3AF; }
+  .mb-panel { display: none; }
+  .mb-panel.active { display: block; }
+  .mb-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+  .mb-status.confirmed   { background: #DCFCE7; color: #15803D; }
+  .mb-status.rescheduled { background: #DBEAFE; color: #1D4ED8; }
+  .mb-status.cancelled   { background: #FEE2E2; color: #DC2626; }
+  .mb-cancel-box { background: #FFF7ED; border: 1.5px solid #FED7AA; border-radius: 14px; padding: 14px 16px; margin-top: 10px; animation: fadeIn 0.2s ease; }
+  .mb-empty { text-align: center; padding: 56px 24px; color: #9CA3AF; }
+  .mb-empty-emoji { font-size: 52px; margin-bottom: 12px; }
+  /* ---- Auth split layout ---- */
+  .auth-split { display: flex; min-height: 100vh; }
+  .auth-left { background: linear-gradient(150deg,#FF6B9A 0%,#FF9A7A 55%,#FFB86B 100%); flex: 1.1; display: flex; flex-direction: column; justify-content: center; padding: 60px 56px; color: white; position: relative; overflow: hidden; }
+  .auth-left::before { content:''; position:absolute; width:320px; height:320px; border-radius:50%; background:rgba(255,255,255,0.08); top:-80px; right:-80px; pointer-events:none; }
+  .auth-left::after { content:''; position:absolute; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.06); bottom:-40px; left:-40px; pointer-events:none; }
+  .auth-right { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 52px; background: white; }
+  .auth-form-box { width: 100%; max-width: 400px; }
+  .auth-field-wrap { margin-bottom: 16px; }
+  .auth-field-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+  .auth-field { width: 100%; border: 1.5px solid #E5E7EB; border-radius: 12px; padding: 13px 16px; font-size: 14px; outline: none; font-family: 'DM Sans', sans-serif; transition: border-color 0.15s, box-shadow 0.15s; color: #1F2937; }
+  .auth-field:focus { border-color: #FF6B9A; box-shadow: 0 0 0 3px rgba(255,107,154,0.12); }
+  .auth-role-btn { flex: 1; border: 2px solid #E5E7EB; border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.15s; background: white; color: #374151; font-family: 'DM Sans', sans-serif; }
+  .auth-role-btn.active { background: linear-gradient(135deg,#FF6B9A,#FF9A7A); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(255,107,154,0.3); }
+  .auth-submit { width: 100%; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 600; }
+  .auth-bullet { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .auth-bullet-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .auth-demo-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 14px; padding: 16px 20px; margin-top: 36px; font-size: 13px; line-height: 1.7; }
+  .auth-demo-box code { background: rgba(255,255,255,0.25); border-radius: 6px; padding: 1px 7px; font-family: monospace; font-size: 12px; }
+  .auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: #9CA3AF; font-size: 13px; }
+  .auth-divider::before, .auth-divider::after { content:''; flex: 1; height: 1px; background: #E5E7EB; }
+  @media (max-width: 768px) { .auth-split { flex-direction: column; } .auth-left { padding: 36px 28px; flex: none; min-height: auto; } .auth-left::before, .auth-left::after { display:none; } .auth-right { padding: 32px 24px; align-items: flex-start; } }
+  /* ---- Pricing (package.html style) ---- */
+  .pkg-section { padding: 80px 8%; background: linear-gradient(135deg,#fff7f9,#fff1e8); }
+  .pkg-label { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #ffe3ec; color: #FF6B9A; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+  .pkg-header { text-align: center; max-width: 760px; margin: 0 auto 50px; }
+  .pkg-header h2 { font-size: 40px; line-height: 1.2; margin: 0 0 16px; color: #252525; font-family: 'Playfair Display', serif; }
+  .pkg-header p { font-size: 17px; color: #666; line-height: 1.6; }
+  .pkg-grid { display: grid; grid-template-columns: repeat(2, minmax(280px,1fr)); gap: 32px; max-width: 1050px; margin: 0 auto; }
+  .pkg-card { position: relative; background: white; border-radius: 28px; padding: 36px; box-shadow: 0 18px 45px rgba(0,0,0,0.08); border: 1px solid #f3dfe6; }
+  .pkg-card.featured { border: 2px solid #FF6B9A; transform: translateY(-10px); }
+  .pkg-badge { position: absolute; top: 22px; right: 22px; background: #FF6B9A; color: white; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .pkg-card h3 { font-size: 26px; margin: 0 0 8px; color: #222; font-family: 'Playfair Display', serif; }
+  .pkg-subtitle { color: #777; font-size: 15px; margin-bottom: 28px; }
+  .pkg-price { margin-bottom: 28px; }
+  .pkg-price span { font-size: 48px; font-weight: 700; color: #FF6B9A; }
+  .pkg-price small { font-size: 15px; color: #777; margin-left: 6px; }
+  .pkg-price.custom span { font-size: 42px; }
+  .pkg-features { list-style: none; padding: 0; margin: 0 0 28px; }
+  .pkg-features li { position: relative; padding-left: 28px; margin-bottom: 14px; font-size: 15px; color: #444; line-height: 1.5; }
+  .pkg-features li::before { content: "✓"; position: absolute; left: 0; top: 0; color: #FF6B9A; font-weight: 700; }
+  .pkg-value { background: #fff5f8; border-radius: 18px; padding: 16px; color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
+  .pkg-btn { display: block; text-align: center; padding: 15px 20px; border-radius: 16px; font-weight: 600; font-size: 15px; transition: 0.3s ease; cursor: pointer; width: 100%; border: none; font-family: 'DM Sans', sans-serif; }
+  .pkg-btn.primary { background: linear-gradient(135deg,#FF6B9A,#FF9A7A); color: white; }
+  .pkg-btn.secondary { background: #222; color: white; }
+  .pkg-btn:hover { transform: translateY(-3px); opacity: 0.9; }
+  @media (max-width: 768px) { .pkg-section { padding: 60px 6%; } .pkg-grid { grid-template-columns: 1fr; } .pkg-card.featured { transform: none; } .pkg-badge { position: static; display: inline-block; margin-bottom: 18px; } }
+  /* ---- Owner Dashboard full-screen layout ---- */
+  .od-sidebar { width:224px; flex-shrink:0; background:white; border-right:1px solid #F3F4F6; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+  .od-sidebar-header { padding:18px 16px 16px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:10px; }
+  .od-sidebar-logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#FF6B9A,#FF9A7A); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; flex-shrink:0; }
+  .od-sidebar-logo-text { font-family:'Playfair Display',serif; font-weight:700; font-size:13.5px; color:#1F2937; line-height:1.2; }
+  .od-sidebar-nav { flex:1; padding:10px; display:flex; flex-direction:column; gap:2px; overflow-y:auto; }
+  .od-sidebar-footer { padding:10px; border-top:1px solid #F3F4F6; }
+  .od-main-area { flex:1; overflow-y:auto; background:#F5F6F8; padding:24px 28px; }
+  .od-stat-pink { background:#FFF0F6; color:#FF6B9A; }
+  .od-stat-green { background:#F0FDF4; color:#22C55E; }
+  .od-stat-yellow { background:#FFFBEB; color:#F59E0B; }
+  .od-stat-purple { background:#F5F3FF; color:#8B5CF6; }
+  .od-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; }
+  .od-cal-hd { font-size:10px; font-weight:700; color:#9CA3AF; text-align:center; padding:4px 0 6px; }
+  .od-cal-cell { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-size:11.5px; color:#374151; margin:1px auto; cursor:default; }
+  .od-cal-today { background:linear-gradient(135deg,#FF6B9A,#FF9A7A); color:white !important; font-weight:700; }
+  .od-cal-booked { background:#FFF0F6; color:#FF6B9A; font-weight:600; border-radius:50%; }
+  .od-cal-other { color:#D1D5DB; }
+  .od-appt-status-confirmed { background:#DCFCE7; color:#15803D; font-size:11px; font-weight:700; padding:3px 10px; border-radius:8px; letter-spacing:.3px; }
+  .od-appt-status-pending { background:#FEF9C3; color:#A16207; font-size:11px; font-weight:700; padding:3px 10px; border-radius:8px; letter-spacing:.3px; }
+  .od-appt-status-noshow { background:#FEE2E2; color:#DC2626; font-size:11px; font-weight:700; padding:3px 10px; border-radius:8px; letter-spacing:.3px; }
+  .od-appt-status-default { background:#F3F4F6; color:#6B7280; font-size:11px; font-weight:700; padding:3px 10px; border-radius:8px; letter-spacing:.3px; }
+  /* Services tab */
+  .svc-filter-btn { border:1.5px solid #E5E7EB; border-radius:999px; padding:6px 18px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#374151; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
+  .svc-filter-btn:hover { border-color:#FF6B9A; color:#FF6B9A; }
+  .svc-filter-btn.active { background:linear-gradient(135deg,#FF6B9A,#FF9A7A); color:white; border-color:transparent; }
+  .svc-card-icon { width:40px; height:40px; border-radius:12px; background:#FFF0F6; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .svc-trending { display:inline-flex; align-items:center; gap:4px; background:#F0FDF4; color:#15803D; font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; }
+  /* Staff tab */
+  .staff-status-available { background:#DCFCE7; color:#15803D; font-size:11px; font-weight:600; padding:3px 10px; border-radius:8px; }
+  .staff-status-busy { background:#FEF9C3; color:#A16207; font-size:11px; font-weight:600; padding:3px 10px; border-radius:8px; }
+  .staff-status-off { background:#F3F4F6; color:#6B7280; font-size:11px; font-weight:600; padding:3px 10px; border-radius:8px; }
+  .staff-skill-tag { display:inline-block; color:#FF6B9A; font-size:11.5px; font-weight:500; }
+  /* ─── Dashboard Mobile Responsive ─── */
+  #od-mob-topbar { display:none; flex-direction:row; justify-content:flex-start; align-items:center; gap:10px; background:white; border-bottom:1px solid #F3F4F6; padding:8px 16px; position:relative; z-index:100; }
+  #od-hamburger { width:36px; height:36px; border:none; background:none; cursor:pointer; display:flex; flex-direction:column; justify-content:center; gap:5px; padding:4px; flex-shrink:0; }
+  #od-hamburger span { display:block; height:2px; border-radius:2px; background:#374151; transition:all 0.2s; }
+  #od-sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:290; }
+  @media (max-width: 768px) {
+    #od-mob-topbar { display:flex; }
+    .od-sidebar { position:fixed; top:0; left:0; bottom:0; z-index:300; transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow:6px 0 28px rgba(0,0,0,0.14); }
+    .od-sidebar.open { transform:translateX(0); }
+    #od-sidebar-overlay.visible { display:block; }
+    #od-layout { flex-direction:column; height:auto; overflow:visible; }
+    .od-main-area { padding:16px 14px; overflow:visible; height:auto; }
+    .od-bk-header { flex-direction:column; align-items:flex-start !important; gap:10px; }
+    .od-bk-header .od-bk-controls { width:100%; flex-wrap:wrap; }
+    .od-bk-header .od-bk-controls input,
+    .od-bk-header .od-bk-controls select { flex:1; min-width:120px; width:auto !important; }
+    .od-overview-header { flex-wrap:wrap; gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION TOAST -->
+<div id="toast" class="notification"></div>
+
+<!-- ==================== PERSISTENT NAVBAR ==================== -->
+<nav id="top-navbar">
+  <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+    <span onclick="navigate(JSON.parse(localStorage.getItem('bms_user')||'null') ? '#salons' : '#landing')" class="flex items-center gap-3 cursor-pointer select-none">
+      <div style="width:72px;height:72px;overflow:hidden;flex-shrink:0;">
+        <img src="salon-booking/bookmysalon_logo.jpg" alt="" style="width:124px;display:block;">
+      </div>
+      <!-- <span class="font-bold text-xl gradient-text" style="font-family:'Playfair Display',serif;">BookMySalon</span> -->
+    </span>
+    <div id="nav-center-links" class="flex items-center gap-6">
+      <span id="nav-salons-link" class="nav-link" onclick="navigate('#salons')">Salons</span>
+      <span id="nav-pricing-link" class="nav-link" onclick="navigate('#pricing')">Pricing</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('km')">ខ្មែរ</button>
+      </div>
+      <div id="nav-auth" class="flex items-center gap-2"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== PAGE: LANDING ==================== -->
+<section id="page-landing" class="page active">
+
+  <!-- HERO -->
+  <div style="background:linear-gradient(160deg,#fff7f9 0%,#fff1e8 100%);">
+    <div class="max-w-6xl mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-12">
+      <!-- Left copy -->
+      <div class="flex-1">
+        <span class="tag inline-block mb-5" data-t="lp_heroTag">✨ Trusted by 500+ salons in Cambodia</span>
+        <h1 class="text-5xl font-bold text-gray-900 leading-tight mb-5">
+          <span data-t="lp_hero1">Better Booking.</span><br><span class="gradient-text" data-t="lp_hero2">Better Business.</span>
+        </h1>
+        <p class="text-gray-500 text-xl mb-8 leading-relaxed" style="max-width:480px" data-t="lp_heroSub">
+          Skip the phone calls. Find salons near you, pick a time, and book instantly. For salon owners — fill your chair every hour.
+        </p>
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="navigate('#salons')" class="btn-primary px-8 py-4 rounded-2xl text-base" data-t="lp_findSalon">💇 Find a Salon</button>
+          <button onclick="navigate('#pricing')" class="lp-btn-outline" data-t="lp_listSalon">🏪 List Your Salon</button>
+        </div>
+        <!-- Stats row -->
+        <div class="flex gap-10 mt-12">
+          <div>
+            <div class="text-3xl font-bold gradient-text" style="font-family:'Playfair Display',serif;">500+</div>
+            <div class="text-gray-400 text-sm mt-0.5" data-t="lp_statSalons">Salons</div>
+          </div>
+          <div>
+            <div class="text-3xl font-bold gradient-text" style="font-family:'Playfair Display',serif;">12K+</div>
+            <div class="text-gray-400 text-sm mt-0.5" data-t="lp_statBookings">Bookings</div>
+          </div>
+          <div>
+            <div class="text-3xl font-bold gradient-text" style="font-family:'Playfair Display',serif;">4.9★</div>
+            <div class="text-gray-400 text-sm mt-0.5" data-t="lp_statRating">Avg Rating</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right: booking mockup card -->
+      <div class="hidden md:flex flex-1 justify-center">
+        <div class="lp-mockup">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="salon-avatar">💇</div>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Glamour Salon</p>
+              <div class="flex items-center gap-1"><span class="star text-xs">⭐</span><span class="text-xs font-semibold text-gray-600">4.9</span><span class="text-xs text-gray-400">(248)</span></div>
+            </div>
+            <span class="ml-auto tag text-xs" data-t="lp_liveBooking">Live Booking</span>
+          </div>
+          <p class="text-xs font-semibold text-gray-500 mb-1">✂️ Haircut &amp; Style · 45 min · <span style="color:#FF6B9A">$35</span></p>
+          <p class="text-xs text-gray-400 mb-4">📅 Today, April 28</p>
+          <div class="flex gap-1.5 flex-wrap mb-4">
+            <div class="lp-tslot">9:00 AM</div>
+            <div class="lp-tslot lp-tslot-sel">10:30 AM</div>
+            <div class="lp-tslot">11:00 AM</div>
+            <div class="lp-tslot lp-tslot-booked">12:00 PM</div>
+            <div class="lp-tslot">2:00 PM</div>
+            <div class="lp-tslot">3:30 PM</div>
+          </div>
+          <button class="btn-primary w-full py-3 rounded-2xl text-sm" data-t="lp_mockupBtn">🎉 Book Now — $35</button>
+          <p class="text-center text-xs text-gray-400 mt-3" data-t="lp_mockupFoot">Instant confirmation · No phone calls</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="bg-white py-20">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <span class="tag inline-block mb-4" data-t="lp_simpleTag">Simple Process</span>
+      <h2 class="text-4xl font-bold text-gray-900 mb-3" data-t="lp_howTitle">How It Works</h2>
+      <p class="text-gray-400 text-lg mb-14" data-t="lp_howSub">Three steps between you and a fresh look.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div class="flex flex-col items-center">
+          <div class="lp-step-icon">🔍</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2" data-t="lp_step1Title">Search</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_step1Desc">Browse 500+ salons by service, price, or location. Filter by rating, availability, or specialty.</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="lp-step-icon">🕐</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2" data-t="lp_step2Title">Pick a Time</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_step2Desc">See real-time availability. Choose a date and time that fits your schedule — no back-and-forth.</p>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="lp-step-icon">✅</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2" data-t="lp_step3Title">Book Instantly</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_step3Desc">Confirm with a tap. Get instant confirmation and an automatic reminder before your appointment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div style="background:#F5F6F8" class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-14">
+        <span class="tag inline-block mb-4" data-t="lp_whyTag">Why BookMySalon</span>
+        <h2 class="text-4xl font-bold text-gray-900"><span data-t="lp_featTitle1">Everything you need,</span><br><span data-t="lp_featTitle2">nothing you don't</span></h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="lp-feat-card">
+          <div class="text-4xl mb-4">🤖</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2" data-t="lp_feat1Title">AI-Powered Search</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_feat1Desc">Smart filters match you to the right salon by service type, price range, and real-time slot availability.</p>
+        </div>
+        <div class="lp-feat-card">
+          <div class="text-4xl mb-4">🔒</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2" data-t="lp_feat2Title">No-Show Protection</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_feat2Desc">A small deposit secures your slot. Salons reduce empty chairs; customers stay committed.</p>
+        </div>
+        <div class="lp-feat-card">
+          <div class="text-4xl mb-4">⚡</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2" data-t="lp_feat3Title">Instant Confirmation</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_feat3Desc">No waiting, no phone tag. Book and receive confirmation immediately, with a reminder before your visit.</p>
+        </div>
+        <div class="lp-feat-card">
+          <div class="text-4xl mb-4">🇰🇭</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2" data-t="lp_feat4Title">Khmer + English</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_feat4Desc">Fully bilingual. Switch between English and ភាសាខ្មែរ at any time with one tap.</p>
+        </div>
+        <div class="lp-feat-card">
+          <div class="text-4xl mb-4">👥</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2" data-t="lp_feat5Title">Group Booking</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_feat5Desc">Coming with friends? Book for 2–4 people at once. One reservation, everyone sorted.</p>
+        </div>
+        <div class="lp-feat-card">
+          <div class="text-4xl mb-4">📅</div>
+          <h3 class="text-lg font-bold text-gray-800 mb-2" data-t="lp_feat6Title">Cancel &amp; Reschedule</h3>
+          <p class="text-gray-400 text-sm leading-relaxed" data-t="lp_feat6Desc">Life happens. Reschedule with a tap or cancel within the free window — all from My Bookings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="bg-white py-20">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-14">
+        <span class="tag inline-block mb-4" data-t="lp_custLoveTag">Customer Love</span>
+        <h2 class="text-4xl font-bold text-gray-900" data-t="lp_custTitle">What our customers say</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="lp-review-card">
+          <div class="text-yellow-400 text-xl mb-3">★★★★★</div>
+          <p class="text-gray-600 text-sm leading-relaxed mb-5" data-t="lp_rev1">"I used to spend 20 minutes on the phone just to book a haircut. Now it takes 30 seconds. Total game-changer."</p>
+          <div class="flex items-center gap-3 mt-auto">
+            <div class="lp-avatar">😊</div>
+            <div><p class="font-semibold text-sm text-gray-800" data-t="lp_rev1Name">Sophie A.</p><p class="text-xs text-gray-400" data-t="lp_rev1City">Phnom Penh</p></div>
+          </div>
+        </div>
+        <div class="lp-review-card featured-review">
+          <div class="text-yellow-400 text-xl mb-3">★★★★★</div>
+          <p class="text-gray-600 text-sm leading-relaxed mb-5" data-t="lp_rev2">"The deposit system is brilliant. No more no-shows ruining our schedule. Revenue is up 30% since we joined."</p>
+          <div class="flex items-center gap-3 mt-auto">
+            <div class="lp-avatar">💇</div>
+            <div><p class="font-semibold text-sm text-gray-800" data-t="lp_rev2Name">Mia — Salon Owner</p><p class="text-xs text-gray-400" data-t="lp_rev2City">Siem Reap</p></div>
+          </div>
+        </div>
+        <div class="lp-review-card">
+          <div class="text-yellow-400 text-xl mb-3">★★★★★</div>
+          <p class="text-gray-600 text-sm leading-relaxed mb-5" data-t="lp_rev3">"I love that I can see real-time availability and book in Khmer. Finally an app built for us!"</p>
+          <div class="flex items-center gap-3 mt-auto">
+            <div class="lp-avatar">✨</div>
+            <div><p class="font-semibold text-sm text-gray-800" data-t="lp_rev3Name">Priya S.</p><p class="text-xs text-gray-400" data-t="lp_rev3City">Battambang</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA BANNER -->
+  <div class="gradient-brand py-20 text-center px-6">
+    <h2 class="text-5xl font-bold text-white mb-4" style="font-family:'Playfair Display',serif;" data-t="lp_ctaTitle">Ready to book?</h2>
+    <p class="text-white/80 text-lg mb-8" data-t="lp_ctaSub">Join 12,000+ customers who never call a salon again.</p>
+    <div class="flex gap-4 justify-center flex-wrap">
+      <button onclick="navigate('#salons')" class="bg-white font-bold px-8 py-4 rounded-2xl text-base hover:shadow-2xl transition-all" style="color:#FF6B9A;" data-t="lp_ctaBtn1">
+        💇 Find a Salon Near You →
+      </button>
+      <button onclick="navigate('#signup')" class="border-2 border-white text-white px-8 py-4 rounded-2xl text-base font-semibold hover:bg-white/10 transition-all" data-t="lp_ctaBtn2">
+        🏪 List Your Salon
+      </button>
+    </div>
+  </div>
+
+</section><!-- /page-landing -->
+
+<!-- ==================== PAGE: SALONS ==================== -->
+<section id="page-salons" class="page">
+<div id="screen-home" class="screen active">
+  <!-- Salons nav strip -->
+  <!-- <div class="gradient-brand shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-end">
+      <button onclick="navigate('#owner-dashboard')" class="bg-white font-semibold px-4 py-2 rounded-full text-sm hover:shadow-lg transition-all" style="color:#FF6B9A;">
+        <span data-t="salonOwner">Salon Owner?</span>
+      </button>
+    </div>
+  </div> -->
+  <!-- Search + Grid -->
+  <div class="max-w-6xl mx-auto px-4 pt-8 pb-12">
+    <div class="max-w-2xl mb-6">
+      <!-- Search Bar -->
+      <div class="flex gap-3 mb-4">
+        <div class="flex-1 flex items-center bg-white border border-gray-200 rounded-2xl px-4 shadow-sm">
+          <span class="text-gray-400 mr-2">🔍</span>
+          <input id="searchInput" type="text" placeholder="Search salons, services..." class="flex-1 py-3 outline-none text-sm" data-ph="searchPh" onkeyup="filterSalons()">
+        </div>
+        <button onclick="filterSalons()" class="btn-primary px-6 py-3 rounded-2xl text-sm">
+          <span data-t="search">Search</span>
+        </button>
+      </div>
+      <!-- Filters -->
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button class="filter-btn active" onclick="setFilter('all', this)" data-t="allSalons">All Salons</button>
+        <button class="filter-btn" onclick="setFilter('nearby', this)">📍 <span data-t="nearMe">Near Me</span></button>
+        <button class="filter-btn" onclick="setFilter('popular', this)">📈 <span data-t="popular">Popular</span></button>
+        <button id="filter-btn-price" class="filter-btn" onclick="togglePriceFilter()">💰 <span data-t="priceFilter">Price</span></button>
+        <button id="filter-btn-service" class="filter-btn" onclick="toggleServiceFilter()">✂️ <span data-t="serviceFilter">Service</span></button>
+      </div>
+      <!-- Price Filter Slider -->
+      <div id="priceFilterPanel" class="hidden bg-white border border-gray-100 rounded-2xl p-4 mb-3 shadow-sm">
+        <p class="text-sm font-semibold text-gray-700 mb-2">💰 <span data-t="priceRange">Price Range</span>: $<span id="priceMin">0</span> – $<span id="priceMax">200</span></p>
+        <input type="range" min="0" max="200" value="200" class="range-input w-full" oninput="document.getElementById('priceMax').textContent=this.value; filterSalons();">
+      </div>
+      <!-- Service Filter -->
+      <div id="serviceFilterPanel" class="hidden bg-white border border-gray-100 rounded-2xl p-4 mb-3 shadow-sm">
+        <p class="text-sm font-semibold text-gray-700 mb-2">✂️ <span data-t="selectService">Select Service</span></p>
+        <div class="flex flex-wrap gap-2">
+          <button class="tag cursor-pointer" onclick="setServiceFilter('Haircut')">Haircut</button>
+          <button class="tag cursor-pointer" onclick="setServiceFilter('Coloring')">Coloring</button>
+          <button class="tag cursor-pointer" onclick="setServiceFilter('Nails')">Nails</button>
+          <button class="tag cursor-pointer" onclick="setServiceFilter('Spa')">Spa</button>
+          <button class="tag cursor-pointer" onclick="setServiceFilter('Massage')">Massage</button>
+          <button class="tag cursor-pointer" onclick="setServiceFilter('Makeup')">Makeup</button>
+          <button class="tag cursor-pointer" onclick="setServiceFilter('')">Clear</button>
+        </div>
+      </div>
+    </div>
+    <!-- Salon Cards Grid -->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-sm text-gray-500"><span id="salonCount">10</span> <span data-t="salonsFound">salons found</span></p>
+      <select class="text-sm border border-gray-200 rounded-xl px-3 py-2 outline-none bg-white" onchange="sortSalons(this.value)">
+        <option value="rating" data-t="sortRating">⭐ Top Rated</option>
+        <option value="price">💰 Price: Low–High</option>
+        <option value="name">🔤 A–Z</option>
+      </select>
+    </div>
+    <div id="salonGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+  </div>
+</div>
+</section><!-- /page-salons -->
+
+<!-- ==================== PAGE: PRICING ==================== -->
+<section id="page-pricing" class="page">
+  <div class="pkg-section">
+    <div class="pkg-header">
+      <span class="pkg-label" data-t="pkg_tag">Pricing Packages</span>
+      <h2 data-t="pkg_title">Choose the Right Plan for Your Beauty Business</h2>
+      <p data-t="pkg_sub">Simple pricing for normal salons, with custom solutions for beauty clinics and multi-branch businesses.</p>
+    </div>
+
+    <div class="pkg-grid">
+      <!-- Pro Plan -->
+      <div class="pkg-card">
+        <div class="mb-6">
+          <h3 data-t="pkg_proTitle">Pro Plan</h3>
+          <p class="pkg-subtitle" data-t="pkg_proSub">For normal salons &amp; barbershops</p>
+        </div>
+        <div class="pkg-price">
+          <span>$15</span><small data-t="pkg_perMonth">/ month</small>
+        </div>
+        <ul class="pkg-features">
+          <li data-t="pkg_proF1">Appointment booking calendar</li>
+          <li data-t="pkg_proF2">Automatic customer reminders</li>
+          <li data-t="pkg_proF3">Customer database &amp; visit history</li>
+          <li data-t="pkg_proF4">Staff-based scheduling</li>
+          <li data-t="pkg_proF5">Facebook / Telegram booking link</li>
+          <li data-t="pkg_proF6">Basic reports</li>
+        </ul>
+        <div class="pkg-value" data-t="pkg_proValue">
+          Best for salons that want to organize bookings, reduce no-shows, and manage daily operations easily.
+        </div>
+        <button onclick="navigate('#signup')" class="pkg-btn primary" data-t="pkg_proBtn">Start with Pro</button>
+      </div>
+
+      <!-- Custom Plan -->
+      <div class="pkg-card featured">
+        <div class="pkg-badge" data-t="pkg_badge">Custom Solution</div>
+        <div class="mb-6">
+          <h3 data-t="pkg_clinicTitle">Clinic / Multi-Branch Plan</h3>
+          <p class="pkg-subtitle" data-t="pkg_clinicSub">For beauty clinics &amp; businesses with many branches</p>
+        </div>
+        <div class="pkg-price custom">
+          <span data-t="pkg_customPrice">Custom</span><small data-t="pkg_basedOn">based on branches</small>
+        </div>
+        <ul class="pkg-features">
+          <li data-t="pkg_clinicF1">Everything in Pro Plan</li>
+          <li data-t="pkg_clinicF2">Multi-branch management</li>
+          <li data-t="pkg_clinicF3">Role-based access for teams</li>
+          <li data-t="pkg_clinicF4">Advanced automatic reminders</li>
+          <li data-t="pkg_clinicF5">Deposit &amp; package tracking</li>
+          <li data-t="pkg_clinicF6">Advanced analytics by branch</li>
+          <li data-t="pkg_clinicF7">Priority onboarding &amp; support</li>
+        </ul>
+        <div class="pkg-value" data-t="pkg_clinicValue">
+          Pricing depends on number of branches, staff users, and feature requirements.
+        </div>
+        <button onclick="showToast('📧 Contact hello@bookmysalon.com','success')" class="pkg-btn secondary" data-t="pkg_clinicBtn">Request Custom Quote</button>
+      </div>
+    </div>
+  </div>
+</section><!-- /page-pricing -->
+
+<!-- ==================== PAGE: LOGIN ==================== -->
+<section id="page-login" class="page">
+  <div style="position:relative;min-height:100vh;background:linear-gradient(150deg,#FF6B9A 0%,#FF9A7A 50%,#FFB86B 100%);display:flex;align-items:center;justify-content:center;padding:40px 16px;">
+    <!-- Back button -->
+    <button onclick="navigate('#landing')" style="position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.2);border:none;color:white;font-size:14px;font-weight:600;padding:8px 16px;border-radius:999px;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.2s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">← Back</button>
+    <div style="background:white;border-radius:24px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+      <!-- Logo + heading -->
+      <div class="flex flex-col items-center mb-8">
+        <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 16px rgba(255,107,154,0.3);">
+          <img src="salon-booking/bookmysalon_logo.jpg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-1" style="font-family:'Playfair Display',serif;">Welcome back</h3>
+        <p class="text-gray-400 text-sm">Sign in to your account to continue.</p>
+      </div>
+
+      <div class="auth-field-wrap">
+        <label class="auth-field-label">Email address</label>
+        <input id="loginEmail" type="email" placeholder="you@example.com" class="auth-field">
+      </div>
+      <div class="auth-field-wrap">
+        <label class="auth-field-label">Password</label>
+        <input id="loginPassword" type="password" placeholder="••••••••" class="auth-field"
+               onkeydown="if(event.key==='Enter') doLogin()">
+      </div>
+
+      <button onclick="doLogin()" class="btn-primary auth-submit mt-2">Sign In →</button>
+
+      <div class="auth-divider">or</div>
+
+      <button onclick="quickDemo('customer')" class="w-full border border-gray-200 py-3 rounded-2xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:border-pink-300 transition-all mb-2">
+        👤 Continue as Demo Customer
+      </button>
+      <button onclick="quickDemo('owner')" class="w-full border border-gray-200 py-3 rounded-2xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:border-pink-300 transition-all">
+        🏪 Continue as Demo Salon Owner
+      </button>
+
+      <p class="text-center text-sm text-gray-400 mt-6">
+        Don't have an account?
+        <span onclick="navigate('#signup')" class="font-semibold cursor-pointer hover:underline" style="color:#FF6B9A;">Sign up free</span>
+      </p>
+    </div>
+  </div>
+</section><!-- /page-login -->
+
+<!-- ==================== PAGE: SIGNUP ==================== -->
+<section id="page-signup" class="page">
+  <div style="position:relative;min-height:100vh;background:linear-gradient(150deg,#FF6B9A 0%,#FF9A7A 50%,#FFB86B 100%);display:flex;align-items:center;justify-content:center;padding:40px 16px;">
+    <!-- Back button -->
+    <button onclick="navigate('#landing')" style="position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.2);border:none;color:white;font-size:14px;font-weight:600;padding:8px 16px;border-radius:999px;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.2s;font-family:'DM Sans',sans-serif;" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">← Back</button>
+    <div style="background:white;border-radius:24px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 24px 64px rgba(0,0,0,0.18);">
+      <!-- Logo + heading -->
+      <div class="flex flex-col items-center mb-8">
+        <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 16px rgba(255,107,154,0.3);">
+          <img src="salon-booking/bookmysalon_logo.jpg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center top;">
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-1" style="font-family:'Playfair Display',serif;">Create your account</h3>
+        <p class="text-gray-400 text-sm">Free forever for customers. Owners get a 14-day trial.</p>
+      </div>
+
+      <!-- Role selector -->
+      <div class="auth-field-wrap">
+        <label class="auth-field-label">I am a…</label>
+        <input type="hidden" id="signupRoleValue" value="customer">
+        <div class="flex gap-3">
+          <button type="button" class="auth-role-btn active" data-role="customer" onclick="selectRole('customer')">
+            👤 Customer
+          </button>
+          <button type="button" class="auth-role-btn" data-role="owner" onclick="selectRole('owner')">
+            🏪 Salon Owner
+          </button>
+        </div>
+      </div>
+
+      <div class="auth-field-wrap">
+        <label class="auth-field-label">Full name</label>
+        <input id="signupName" type="text" placeholder="Sok Dara" class="auth-field">
+      </div>
+      <div class="auth-field-wrap">
+        <label class="auth-field-label">Email address</label>
+        <input id="signupEmail" type="email" placeholder="you@example.com" class="auth-field">
+      </div>
+      <div class="auth-field-wrap">
+        <label class="auth-field-label">Password</label>
+        <input id="signupPassword" type="password" placeholder="Min 6 characters" class="auth-field"
+               onkeydown="if(event.key==='Enter') doSignup()">
+      </div>
+
+      <button onclick="doSignup()" class="btn-primary auth-submit mt-2">Create Account →</button>
+
+      <p class="text-center text-xs text-gray-300 mt-4">By signing up you agree to our Terms of Service.</p>
+
+      <p class="text-center text-sm text-gray-400 mt-4">
+        Already have an account?
+        <span onclick="navigate('#login')" class="font-semibold cursor-pointer hover:underline" style="color:#FF6B9A;">Sign in</span>
+      </p>
+    </div>
+  </div>
+</section><!-- /page-signup -->
+
+<!-- ==================== PAGE: SALON DETAIL + BOOKING ==================== -->
+<section id="page-salon-id" class="page">
+<div id="screen-salon" class="screen active">
+  <div class="nav-header">
+    <div class="max-w-2xl mx-auto">
+      <button onclick="goTo('screen-home')" class="flex items-center gap-2 text-white text-sm mb-3 transition-colors font-semibold" style="background:rgba(0,0,0,0.18);padding:5px 12px;border-radius:999px;border:none;cursor:pointer;">← <span data-t="back">Back</span></button>
+      <div class="flex items-start justify-between">
+        <div>
+          <h2 class="text-2xl text-white" id="detailName"></h2>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="star">⭐</span>
+            <span class="text-white font-semibold" id="detailRating"></span>
+            <span class="text-white/70 text-sm" id="detailReviews"></span>
+          </div>
+        </div>
+        <button onclick="openReviewModal()" class="bg-white/20 text-white text-xs px-3 py-2 rounded-xl hover:bg-white/30 transition-all">✍️ <span data-t="writeReview">Write Review</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="max-w-2xl mx-auto px-4 py-6">
+    <!-- Salon Photos -->
+    <div class="flex gap-3 mb-5 overflow-x-auto pb-1">
+      <div id="salonPhotos" class="flex gap-3"></div>
+    </div>
+    <!-- Info -->
+    <div class="flex items-center gap-2 text-gray-500 text-sm mb-1">
+      <span>📍</span><span id="detailAddress"></span>
+    </div>
+    <div class="flex items-center gap-2 text-gray-500 text-sm mb-4">
+      <span>⏰</span><span id="detailHours"></span>
+    </div>
+    <!-- Walk-in Toggle (visible to owner mode) -->
+    <div id="walkinBadge" class="hidden bg-green-50 border border-green-200 rounded-xl px-4 py-2 mb-4 flex items-center gap-2 text-sm text-green-700 font-medium">
+      🚶 <span data-t="walkinAvailable">Walk-ins currently available</span>
+    </div>
+    <!-- Services -->
+    <h3 class="text-xl font-bold mb-4" data-t="services">Services</h3>
+    <div id="serviceList" class="space-y-3"></div>
+    <!-- Reviews -->
+    <div class="mt-8">
+      <h3 class="text-xl font-bold mb-4">⭐ <span data-t="reviews">Reviews</span></h3>
+      <div id="reviewList" class="space-y-3"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN: BOOKING ==================== -->
+<div id="screen-booking" class="screen">
+  <div class="nav-header">
+    <div class="max-w-lg mx-auto">
+      <button onclick="goTo('screen-salon')" class="flex items-center gap-2 text-white/80 hover:text-white text-sm mb-3 transition-colors">← <span data-t="back">Back</span></button>
+      <h2 class="text-2xl text-white" id="bookingSalonName"></h2>
+      <div class="flex items-center gap-2 mt-1">
+        <span class="star">⭐</span>
+        <span class="text-white font-semibold" id="bookingRating"></span>
+        <span class="text-white/70 text-sm" id="bookingReviews"></span>
+      </div>
+      <!-- Progress Bar -->
+      <div class="flex items-center gap-2 mt-4">
+        <div class="progress-step done" id="ps1">1</div>
+        <div class="flex-1 h-0.5 bg-white/40 rounded"></div>
+        <div class="progress-step" id="ps2">2</div>
+        <div class="flex-1 h-0.5 bg-white/40 rounded"></div>
+        <div class="progress-step" id="ps3">3</div>
+      </div>
+      <div class="flex justify-between mt-1">
+        <span class="text-white/70 text-xs" data-t="service">Service</span>
+        <span class="text-white/70 text-xs" data-t="dateTime">Date & Time</span>
+        <span class="text-white/70 text-xs" data-t="confirm">Confirm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Service already chosen, show summary -->
+  <div class="max-w-lg mx-auto px-4 py-6 space-y-5">
+    <button onclick="goTo('screen-salon')" class="flex items-center gap-1 text-gray-500 text-sm hover:text-pink-500 transition-colors">← <span data-t="changeService">Change service</span></button>
+    
+    <!-- Selected Service Card -->
+    <div class="bg-pink-50 border border-pink-100 rounded-2xl p-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <h4 class="font-bold text-gray-800 text-lg" id="bkService"></h4>
+          <p class="text-gray-500 text-sm" id="bkDuration"></p>
+          <div class="flex gap-2 mt-2" id="bkTags"></div>
+        </div>
+        <span class="text-pink-500 font-bold text-xl" id="bkPrice"></span>
+      </div>
+    </div>
+
+    <!-- Customer Info -->
+    <div class="bg-gray-50 rounded-2xl p-4">
+      <p class="text-sm font-semibold text-gray-700 mb-3">👤 <span data-t="yourInfo">Your Info</span></p>
+      <div class="space-y-3">
+        <input id="custName" type="text" placeholder="Full name" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400" data-ph="namePh">
+        <input id="custPhone" type="tel" placeholder="Phone number" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400" data-ph="phonePh">
+        <div class="flex gap-2">
+          <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+            <input type="checkbox" id="groupBooking" class="accent-pink-500"> 
+            <span data-t="groupBooking">Group booking</span>
+          </label>
+          <select id="groupCount" class="hidden border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none ml-auto">
+            <option value="2">2 people</option>
+            <option value="3">3 people</option>
+            <option value="4">4 people</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date Picker -->
+    <div>
+      <p class="text-sm font-semibold text-gray-700 mb-3">📅 <span data-t="selectDate">Select Date</span></p>
+      <div id="dateStrip" class="flex gap-2 overflow-x-auto pb-1"></div>
+    </div>
+
+    <!-- Time Slots -->
+    <div>
+      <p class="text-sm font-semibold text-gray-700 mb-2">🕐 <span data-t="selectTime">Select a time</span></p>
+      <div class="flex items-center gap-4 mb-3 text-xs text-gray-500">
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded border border-gray-200 inline-block"></span> <span data-t="available">Available</span></span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-pink-100 inline-block"></span> <span data-t="booked">Booked</span></span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-200 inline-block"></span> <span data-t="blocked">Blocked</span></span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gradient-to-r from-pink-400 to-orange-400 inline-block"></span> <span data-t="selected">Selected</span></span>
+      </div>
+      <div id="timeGrid" class="grid grid-cols-4 gap-2"></div>
+    </div>
+
+    <!-- Deposit Notice -->
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm">
+      <p class="font-semibold text-amber-800 mb-1">🔒 <span data-t="depositTitle">No-Show Protection</span></p>
+      <p class="text-amber-700" data-t="depositDesc">A $5 deposit is required to confirm your booking. This will be deducted from your service total. Cancelling within 2h of appointment forfeits the deposit.</p>
+    </div>
+
+    <button onclick="proceedToConfirm()" class="btn-green w-full py-4 rounded-2xl text-base">
+      <span data-t="continueConfirm">Continue to Confirm →</span>
+    </button>
+  </div>
+</div>
+</section><!-- /page-salon-id -->
+
+<!-- ==================== PAGE: CONFIRM + SUCCESS ==================== -->
+<section id="page-confirm" class="page">
+<div id="screen-confirm" class="screen active">
+  <div class="nav-header">
+    <div class="max-w-lg mx-auto">
+      <button onclick="goTo('screen-booking')" class="flex items-center gap-2 text-white/80 hover:text-white text-sm mb-3 transition-colors">← <span data-t="back">Back</span></button>
+      <h2 class="text-2xl text-white" data-t="confirmBooking">Confirm Booking</h2>
+    </div>
+  </div>
+  <div class="max-w-lg mx-auto px-4 py-6 space-y-4">
+    <div class="card p-5 space-y-3">
+      <h3 class="font-bold text-gray-800" data-t="bookingSummary">Booking Summary</h3>
+      <div class="flex justify-between text-sm"><span class="text-gray-500" data-t="salon">Salon</span><span class="font-medium" id="cfSalon"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500" data-t="service">Service</span><span class="font-medium" id="cfService"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500" data-t="dateTime">Date & Time</span><span class="font-medium" id="cfDateTime"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500" data-t="customer">Customer</span><span class="font-medium" id="cfCustomer"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500" data-t="guests">Guests</span><span class="font-medium" id="cfGuests"></span></div>
+      <hr class="border-gray-100">
+      <div class="flex justify-between text-sm"><span class="text-gray-500" data-t="servicePrice">Service Price</span><span class="font-medium" id="cfServicePrice"></span></div>
+      <div class="flex justify-between text-sm text-amber-700"><span data-t="depositRequired">Deposit Required</span><span class="font-medium">$5.00</span></div>
+      <div class="flex justify-between font-bold border-t pt-2 mt-1"><span data-t="totalDue">Total Due Now</span><span class="text-pink-500">$5.00</span></div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="card p-5">
+      <p class="font-semibold text-gray-800 mb-3">💳 <span data-t="payDeposit">Pay Deposit</span></p>
+      <div class="space-y-2">
+        <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:border-pink-300 transition-colors">
+          <input type="radio" name="payment" value="aba" checked class="accent-pink-500"> 
+          <span class="text-sm font-medium">🏦 ABA Pay</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:border-pink-300 transition-colors">
+          <input type="radio" name="payment" value="wing" class="accent-pink-500"> 
+          <span class="text-sm font-medium">💚 Wing Money</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:border-pink-300 transition-colors">
+          <input type="radio" name="payment" value="cash" class="accent-pink-500"> 
+          <span class="text-sm font-medium">💵 Pay at Salon</span>
+        </label>
+      </div>
+    </div>
+
+    <button onclick="confirmBooking()" class="btn-green w-full py-4 rounded-2xl text-base">
+      🎉 <span data-t="bookNow">Book Now</span>
+    </button>
+  </div>
+</div>
+
+<!-- ==================== SCREEN: SUCCESS ==================== -->
+<div id="screen-success" class="screen">
+  <div class="max-w-lg mx-auto px-4 py-16 text-center fade-in">
+    <div class="text-7xl mb-6">🎉</div>
+    <h2 class="text-3xl font-bold text-gray-800 mb-2" data-t="bookingConfirmed">Booking Confirmed!</h2>
+    <p class="text-gray-500 mb-8" data-t="bookingConfirmedSub">Your appointment has been booked. See you soon!</p>
+    
+    <div class="card p-5 text-left mb-6 space-y-2">
+      <div class="flex justify-between text-sm"><span class="text-gray-500">Salon</span><span class="font-medium" id="sucSalon"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500">Service</span><span class="font-medium" id="sucService"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500">Date & Time</span><span class="font-medium" id="sucDateTime"></span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-500">Booking ID</span><span class="font-mono text-pink-500 text-xs" id="sucBookingId"></span></div>
+    </div>
+
+    <div class="flex gap-3 justify-center">
+      <button onclick="goTo('screen-mybookings')" class="btn-primary px-6 py-3 rounded-2xl text-sm">📋 <span data-t="myBookings">My Bookings</span></button>
+      <button onclick="goTo('screen-home')" class="border border-gray-200 px-6 py-3 rounded-2xl text-sm font-medium hover:bg-gray-50 transition-colors">🏠 <span data-t="backHome">Home</span></button>
+    </div>
+  </div>
+</div>
+
+</section><!-- /page-confirm -->
+
+<!-- ==================== PAGE: MY BOOKINGS ==================== -->
+<section id="page-my-bookings" class="page">
+<div id="screen-mybookings" class="screen active">
+
+  <!-- Page header -->
+  <div class="gradient-brand">
+    <div class="max-w-2xl mx-auto px-4 py-5 flex items-center justify-between">
+      <div>
+        <button onclick="navigate('#salons')" class="flex items-center gap-2 text-white/80 hover:text-white text-sm mb-2 transition-colors">← Back to Salons</button>
+        <h2 class="text-2xl font-bold text-white" style="font-family:'Playfair Display',serif;">My Bookings</h2>
+      </div>
+      <div id="mb-user-chip"></div>
+    </div>
+  </div>
+
+  <div class="max-w-2xl mx-auto px-4 py-8">
+
+    <!-- Guest (not logged in) -->
+    <div id="mb-guest" class="hidden">
+      <div class="mb-empty">
+        <div class="mb-empty-emoji">🔐</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Sign in to see your bookings</h3>
+        <p class="text-gray-400 text-sm mb-6">Your appointment history is tied to your account.</p>
+        <button onclick="navigate('#login')" class="btn-primary px-8 py-3 rounded-2xl text-sm">Login to View Bookings</button>
+      </div>
+    </div>
+
+    <!-- Logged-in content -->
+    <div id="mb-content" class="hidden">
+
+      <!-- Tab bar -->
+      <div class="mb-tab-bar">
+        <button class="mb-tab active" id="mb-tab-upcoming" onclick="switchMbTab('upcoming')">
+          📅 Upcoming<span id="mb-cnt-upcoming" class="mb-count empty">0</span>
+        </button>
+        <button class="mb-tab" id="mb-tab-past" onclick="switchMbTab('past')">
+          ✅ Past<span id="mb-cnt-past" class="mb-count empty">0</span>
+        </button>
+        <button class="mb-tab" id="mb-tab-cancelled" onclick="switchMbTab('cancelled')">
+          ❌ Cancelled<span id="mb-cnt-cancelled" class="mb-count empty">0</span>
+        </button>
+      </div>
+
+      <!-- Panels -->
+      <div id="mb-panel-upcoming" class="mb-panel active space-y-4"></div>
+      <div id="mb-panel-past"     class="mb-panel space-y-4"></div>
+      <div id="mb-panel-cancelled" class="mb-panel space-y-4"></div>
+
+    </div>
+  </div>
+</div>
+</section><!-- /page-my-bookings -->
+
+<!-- ==================== PAGE: OWNER DASHBOARD ==================== -->
+<section id="page-owner-dashboard" class="page">
+<div id="screen-owner" class="screen active">
+
+  <!-- ACCESS DENIED -->
+  <div id="od-denied" class="hidden min-h-screen flex items-center justify-center px-4">
+    <div class="text-center max-w-sm">
+      <div class="text-7xl mb-5">🔒</div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2" style="font-family:'Playfair Display',serif;">Access Denied</h2>
+      <p class="text-gray-400 mb-6">This page is only available to salon owners. Sign in with an owner account to continue.</p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="navigate('#login')" class="btn-primary px-6 py-3 rounded-2xl text-sm">Sign In as Owner</button>
+        <button onclick="navigate('#landing')" class="border border-gray-200 text-gray-600 px-6 py-3 rounded-2xl text-sm font-medium hover:bg-gray-50 transition-colors">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div id="od-main" class="hidden">
+
+    <!-- ─── MOBILE TOPBAR ─── -->
+    <div id="od-mob-topbar">
+      <button id="od-hamburger" onclick="openSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div style="flex:1;display:flex;justify-content:center;align-items:center;">
+        <img src="salon-booking/bookmysalon_logo.jpg" alt="BookMySalon"
+          style="height:64px;width:auto;object-fit:contain;">
+      </div>
+      <div style="width:36px;flex-shrink:0;"></div>
+    </div>
+
+    <!-- ─── SIDEBAR OVERLAY ─── -->
+    <div id="od-sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <div id="od-layout" style="display:flex;height:100vh;overflow:hidden;">
+
+      <!-- ─── SIDEBAR ─── -->
+      <aside class="od-sidebar">
+        <div class="od-sidebar-header">
+          <img src="salon-booking/bookmysalon_logo.jpg" alt="BookMySalon" style="width:34px;height:34px;border-radius:10px;object-fit:cover;flex-shrink:0;">
+          <span class="od-sidebar-logo-text" id="od-salon-name">Glamour Salon</span>
+        </div>
+        <nav class="od-sidebar-nav">
+          <div class="sidebar-link active" onclick="ownerTab('overview',event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span data-t="dashboard">Dashboard</span>
+          </div>
+          <div class="sidebar-link" onclick="ownerTab('bookings',event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span data-t="appointments">Appointments</span>
+          </div>
+          <div class="sidebar-link" onclick="ownerTab('services',event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="20.49" y1="3.51" x2="3.51" y2="20.49"/></svg>
+            <span data-t="services">Services</span>
+          </div>
+          <div class="sidebar-link" onclick="ownerTab('staff',event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span data-t="staffNav">Staff</span>
+          </div>
+          <div class="sidebar-link" onclick="ownerTab('settings',event)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span data-t="settings">Settings</span>
+          </div>
+        </nav>
+        <div class="od-sidebar-footer">
+          <div class="sidebar-link" style="color:#EF4444;" onclick="doLogout()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span data-t="logout">Logout</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ─── MAIN AREA ─── -->
+      <main class="od-main-area">
+
+        <!-- ── OVERVIEW TAB ── -->
+        <div id="ownerTab-overview" class="space-y-5 fade-in">
+          <!-- Header -->
+          <div class="od-overview-header flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800" style="font-family:'Playfair Display',serif;">Dashboard</h2>
+              <p class="text-gray-400 text-sm mt-0.5 flex items-center gap-1" id="od-today-label"></p>
+            </div>
+            <button onclick="ownerTab('bookings',{currentTarget:document.querySelectorAll('.sidebar-link')[1]})" class="btn-primary px-4 py-2.5 rounded-xl text-sm">+ New Booking</button>
+          </div>
+
+          <!-- Stat cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="card p-4 flex items-center gap-3">
+              <div class="od-stat-icon od-stat-pink">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-gray-800" id="od-stat-bookings">—</div>
+                <div class="text-xs text-gray-400">Today's Bookings</div>
+              </div>
+            </div>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="od-stat-icon od-stat-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-green-500" id="od-stat-revenue">—</div>
+                <div class="text-xs text-gray-400">Today's Revenue</div>
+              </div>
+            </div>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="od-stat-icon od-stat-yellow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-yellow-500" id="od-stat-noshows">—</div>
+                <div class="text-xs text-gray-400">Pending Bookings</div>
+              </div>
+            </div>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="od-stat-icon od-stat-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+              </div>
+              <div>
+                <div class="text-2xl font-bold text-purple-500" id="od-stat-rating">—</div>
+                <div class="text-xs text-gray-400">New Customers</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Appointments + Mini Calendar -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="card p-5 lg:col-span-2">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-gray-800">Today's Appointments</h3>
+                <div class="flex items-center gap-3 text-xs text-gray-400">
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span>Confirmed</span>
+                  <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-400 inline-block"></span>Pending</span>
+                </div>
+              </div>
+              <div id="od-today-list" class="space-y-0.5"></div>
+            </div>
+            <div class="card p-5">
+              <h3 class="font-bold text-gray-800" id="od-cal-title">Calendar</h3>
+              <div id="od-mini-calendar" class="mt-2"></div>
+              <!-- <div class="mt-4 pt-3 border-t border-gray-100 space-y-1.5">
+                <a class="flex items-center gap-1.5 text-xs text-pink-500 cursor-pointer hover:text-pink-700 font-medium" onclick="ownerTab('schedule',{currentTarget:document.querySelectorAll('.sidebar-link')[2]})">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>View Full Calendar
+                </a>
+                <a class="flex items-center gap-1.5 text-xs text-pink-500 cursor-pointer hover:text-pink-700 font-medium">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>Analytics Report
+                </a>
+                <a class="flex items-center gap-1.5 text-xs text-pink-500 cursor-pointer hover:text-pink-700 font-medium" onclick="ownerTab('settings',{currentTarget:document.querySelectorAll('.sidebar-link')[4]})">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>Availability Settings
+                </a>
+              </div> -->
+            </div>
+          </div>
+
+          <!-- Bottom row: Revenue Trend + Recovery Insights -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="card p-6 relative overflow-hidden">
+              <div class="relative z-10">
+                <span class="inline-block bg-pink-100 text-pink-600 text-xs font-semibold px-3 py-1 rounded-full mb-3">→ Revenue</span>
+                <div class="text-4xl font-bold text-pink-500 mb-0.5" id="od-revenue-pct">—</div>
+                <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">REVENUE INCREASE</div>
+                <div class="text-xs text-gray-400 mt-1.5" id="od-revenue-pct-sub">Compared to last month</div>
+              </div>
+              <div class="absolute bottom-0 right-0 opacity-10 pointer-events-none">
+                <svg width="160" height="80" viewBox="0 0 160 80"><polyline points="0,70 35,52 70,62 105,22 140,6 160,16" fill="none" stroke="#FF6B9A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="card p-6">
+              <h3 class="font-bold text-gray-800 mb-4">Recovery Insights</h3>
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 bg-pink-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B9A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-gray-800">Revenue</div>
+                    <div class="text-xs text-gray-400">Bookings</div>
+                  </div>
+                </div>
+                <span class="text-xs font-semibold bg-red-100 text-red-500 px-2.5 py-1 rounded-lg" id="od-ns-pct">No-Shows</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-1.5 mb-3">
+                <div class="gradient-brand h-1.5 rounded-full transition-all" id="od-recovery-bar" style="width:0%"></div>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-400">This month</span>
+                <span class="font-semibold text-gray-700" id="od-recovery-rev">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden walkin toggle kept for JS compatibility -->
+          <div class="hidden" aria-hidden="true">
+            <input type="checkbox" id="walkinToggle" onchange="toggleWalkin()">
+          </div>
+        </div><!-- /ownerTab-overview -->
+
+        <!-- ── SCHEDULE TAB ── -->
+        <div id="ownerTab-schedule" class="hidden fade-in">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800" style="font-family:'Playfair Display',serif;">Weekly Schedule</h2>
+              <p class="text-gray-400 text-sm mt-0.5" id="od-week-label"></p>
+            </div>
+            <button onclick="openBlockModal()" class="btn-primary px-4 py-2 rounded-xl text-sm">⛔ Block Time</button>
+          </div>
+          <div class="card overflow-hidden">
+            <div id="od-week-grid" class="overflow-x-auto p-2"></div>
+          </div>
+          <div class="flex gap-5 mt-3 text-xs text-gray-400">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-gradient-to-r from-pink-400 to-orange-400 inline-block"></span>Booked</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-gray-200 rounded inline-block"></span>Blocked (click to unblock)</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-pink-50 border border-pink-200 rounded inline-block"></span>Free (click to block)</span>
+          </div>
+        </div>
+
+        <!-- ── BOOKINGS TAB ── -->
+        <div id="ownerTab-bookings" class="hidden fade-in">
+          <div class="od-bk-header flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-800" style="font-family:'Playfair Display',serif;">All Bookings</h2>
+            <div class="od-bk-controls flex items-center gap-2">
+              <input id="od-bk-search" type="text" placeholder="Search customer…"
+                class="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-pink-400 w-44"
+                oninput="renderOwnerBookings()">
+              <select id="od-bk-filter" onchange="renderOwnerBookings()"
+                class="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-pink-400 bg-white">
+                <option value="all">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="rescheduled">Rescheduled</option>
+                <option value="pending">Pending</option>
+                <option value="no-show">No-Show</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="od-table w-full">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Date / Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="od-bk-tbody"></tbody>
+              </table>
+            </div>
+            <div id="od-bk-empty" class="hidden text-center py-12 text-gray-400">
+              <div class="text-4xl mb-2">📭</div>
+              <p class="text-sm">No bookings match the current filter</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── NO-SHOWS TAB ── -->
+        <div id="ownerTab-noshows" class="hidden fade-in space-y-4">
+          <h2 class="text-xl font-bold text-gray-800" style="font-family:'Playfair Display',serif;">No-Show Protection</h2>
+          <div class="card p-5 flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center text-white text-2xl flex-shrink-0">🛡️</div>
+            <div>
+              <p class="text-xs text-gray-400 uppercase font-semibold tracking-wide mb-1">Total Revenue Protected</p>
+              <p class="text-3xl font-bold text-green-500" id="od-ns-total">$0</p>
+              <p class="text-xs text-gray-400">Deposits forfeited by no-show customers</p>
+            </div>
+          </div>
+          <div class="card p-5">
+            <h4 class="font-semibold text-gray-700 mb-4">No-Show History</h4>
+            <div id="od-ns-list" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- ── SETTINGS TAB ── -->
+        <div id="ownerTab-settings" class="hidden fade-in">
+          <h2 class="text-xl font-bold text-gray-800 mb-5" style="font-family:'Playfair Display',serif;">Salon Settings</h2>
+          <div class="card p-6 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-semibold text-gray-700 block mb-2">Salon Name</label>
+                <input id="set-salon-name" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400">
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-gray-700 block mb-2">Address</label>
+                <input id="set-address" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400">
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-gray-700 block mb-2">Open Time</label>
+                <input id="set-open" type="time" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400">
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-gray-700 block mb-2">Close Time</label>
+                <input id="set-close" type="time" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400">
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-gray-700 block mb-2">Deposit Amount ($)</label>
+                <input id="set-deposit" type="number" min="0" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400">
+              </div>
+              <div>
+                <label class="text-sm font-semibold text-gray-700 block mb-2">Free Cancellation Window (hrs)</label>
+                <input id="set-cancel-window" type="number" min="0" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400">
+              </div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <p class="font-semibold text-sm text-gray-700">Walk-in Mode</p>
+                  <p class="text-xs text-gray-400">Accept walk-in customers during slow periods</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="set-walkin" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <p class="font-semibold text-sm text-gray-700">Deposit System</p>
+                  <p class="text-xs text-gray-400">Require deposit to confirm bookings</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="set-deposit-enabled" checked class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                </label>
+              </div>
+            </div>
+            <button onclick="saveOwnerSettings()" class="btn-primary w-full py-3 rounded-xl text-sm">💾 Save Changes</button>
+          </div>
+        </div>
+
+        <!-- ── SERVICES TAB ── -->
+        <div id="ownerTab-services" class="hidden fade-in">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-xl font-bold text-gray-800" style="font-family:'Playfair Display',serif;">Services</h2>
+            <button onclick="openAddServiceModal()" class="btn-primary px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Service
+            </button>
+          </div>
+          <div class="flex gap-2 mb-5 flex-wrap">
+            <button class="svc-filter-btn active" onclick="filterServices('All',this)">All</button>
+            <button class="svc-filter-btn" onclick="filterServices('Hair',this)">Hair</button>
+            <button class="svc-filter-btn" onclick="filterServices('Skin',this)">Skin</button>
+            <button class="svc-filter-btn" onclick="filterServices('Nails',this)">Nails</button>
+            <button class="svc-filter-btn" onclick="filterServices('Body',this)">Body</button>
+            <button class="svc-filter-btn" onclick="filterServices('Beauty',this)">Beauty</button>
+          </div>
+          <div id="svc-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- ── STAFF TAB ── -->
+        <div id="ownerTab-staff" class="hidden fade-in">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-xl font-bold text-gray-800" style="font-family:'Playfair Display',serif;">Staff</h2>
+            <button onclick="openAddStaffModal()" class="btn-primary px-4 py-2.5 rounded-xl text-sm flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+              Add Staff
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="card p-4 text-center">
+              <div class="text-2xl font-bold text-gray-800" id="staff-total">—</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="totalStaff">Total Staff</div>
+            </div>
+            <div class="card p-4 text-center">
+              <div class="text-2xl font-bold text-gray-800" id="staff-available">—</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="availableNow">Available Now</div>
+            </div>
+            <div class="card p-4 text-center">
+              <div class="text-2xl font-bold text-gray-800" id="staff-rating">—</div>
+              <div class="text-xs text-gray-400 mt-1" data-t="avgRating">Avg Rating</div>
+            </div>
+          </div>
+          <div class="card overflow-hidden">
+            <div id="staff-list" class="divide-y divide-gray-50"></div>
+          </div>
+        </div>
+
+      </main><!-- /od-main-area -->
+    </div><!-- /flex layout -->
+
+  </div><!-- /od-main -->
+</div><!-- /screen-owner -->
+
+</section><!-- /page-owner-dashboard -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Review Modal -->
+<div id="reviewModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-xl font-bold" data-t="writeReview">Write a Review</h3>
+      <button onclick="closeModal('reviewModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+    </div>
+    <p class="text-sm text-gray-500 mb-3" id="reviewSalonName"></p>
+    <div class="flex gap-1 mb-4">
+      <span class="review-star" onclick="setReviewStar(1)">★</span>
+      <span class="review-star" onclick="setReviewStar(2)">★</span>
+      <span class="review-star" onclick="setReviewStar(3)">★</span>
+      <span class="review-star" onclick="setReviewStar(4)">★</span>
+      <span class="review-star" onclick="setReviewStar(5)">★</span>
+    </div>
+    <textarea id="reviewText" rows="4" placeholder="Share your experience..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400 resize-none" data-ph="reviewPh"></textarea>
+    <button onclick="submitReview()" class="btn-primary w-full py-3 rounded-xl mt-4 text-sm" data-t="submitReview">Submit Review</button>
+  </div>
+</div>
+
+<!-- Reschedule Modal -->
+<div id="rescheduleModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-xl font-bold" data-t="reschedule">Reschedule Booking</h3>
+      <button onclick="closeModal('rescheduleModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+    </div>
+    <p class="text-sm text-gray-500 mb-4" id="rescheduleInfo"></p>
+    <div class="space-y-3">
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="newDate">New Date</label>
+        <input type="date" id="rescheduleDate" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="newTime">New Time</label>
+        <select id="rescheduleTime" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+          <option>9:00 AM</option><option>9:30 AM</option><option>10:00 AM</option><option>10:30 AM</option>
+          <option>11:00 AM</option><option>11:30 AM</option><option>2:00 PM</option><option>3:00 PM</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="confirmReschedule()" class="btn-primary w-full py-3 rounded-xl mt-5 text-sm" data-t="confirmReschedule">Confirm Reschedule</button>
+  </div>
+</div>
+
+<!-- Block Time Modal (Owner) -->
+<div id="blockModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-xl font-bold" data-t="blockTimeSlot">Block Time Slot</h3>
+      <button onclick="closeModal('blockModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+    </div>
+    <div class="space-y-3">
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="reason">Reason</label>
+        <select class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+          <option data-t="staffBreak">Staff Break</option>
+          <option data-t="personalTime">Personal Time</option>
+          <option data-t="maintenance">Maintenance</option>
+          <option data-t="other">Other</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1" data-t="startTime">Start Time</label>
+          <select class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400" id="blockStart">
+            <option>12:00 PM</option><option>12:30 PM</option><option>1:00 PM</option><option>1:30 PM</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1" data-t="endTime">End Time</label>
+          <select class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400" id="blockEnd">
+            <option>1:00 PM</option><option>1:30 PM</option><option>2:00 PM</option><option>2:30 PM</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button onclick="confirmBlock()" class="btn-primary w-full py-3 rounded-xl mt-5 text-sm" data-t="blockConfirm">Block These Times</button>
+  </div>
+</div>
+
+<!-- Add Service Modal -->
+<div id="addServiceModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-xl font-bold" style="font-family:'Playfair Display',serif;" data-t="addServiceTitle">Add New Service</h3>
+      <button onclick="closeModal('addServiceModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="serviceName">Service Name</label>
+        <input type="text" id="newSvcName" placeholder="e.g. Deep Conditioning" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="categoryLabel">Category</label>
+        <select id="newSvcCat" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+          <option value="Hair">Hair</option>
+          <option value="Skin">Skin</option>
+          <option value="Nails">Nails</option>
+          <option value="Body">Body</option>
+          <option value="Beauty">Beauty</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1" data-t="priceLabel">Price ($)</label>
+          <input type="number" id="newSvcPrice" min="1" placeholder="0" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1" data-t="durationLabel">Duration (min)</label>
+          <input type="number" id="newSvcDur" min="5" step="5" placeholder="30" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+        </div>
+      </div>
+    </div>
+    <button onclick="submitAddService()" class="btn-primary w-full py-3 rounded-xl mt-5 text-sm" data-t="addServiceBtn">Add Service</button>
+  </div>
+</div>
+
+<!-- Add Staff Modal -->
+<div id="addStaffModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-xl font-bold" style="font-family:'Playfair Display',serif;" data-t="addStaffTitle">Add New Staff</h3>
+      <button onclick="closeModal('addStaffModal')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="fullName">Full Name</label>
+        <input type="text" id="newStaffName" placeholder="e.g. Jane Smith" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="roleTitle">Role / Title</label>
+        <input type="text" id="newStaffRole" placeholder="e.g. Senior Stylist" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="skillsLabel">Skills (comma-separated)</label>
+        <input type="text" id="newStaffSkills" placeholder="e.g. Haircut, Coloring" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700 block mb-1" data-t="statusLabel">Status</label>
+        <select id="newStaffStatus" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-pink-400">
+          <option value="available" data-t="statusAvailable">Available</option>
+          <option value="busy" data-t="statusBusy">Busy</option>
+          <option value="off" data-t="statusOff">Off</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="submitAddStaff()" class="btn-primary w-full py-3 rounded-xl mt-5 text-sm" data-t="addStaffMemberBtn">Add Staff Member</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const SALONS = [
+  { id:1, name:"Glamour Salon", emoji:"💇", rating:4.9, reviews:248, address:"271 Mao Tse Tung Blvd, Toul Kork, Phnom Penh", hours:"9:00 AM – 7:00 PM", tags:["Haircut","Coloring","Styling"], photos:["💇","✂️","💄"], walkin:false,
+    services:[
+      {id:"s1",name:"Haircut & Style",duration:"45 min",price:35,tags:["Haircut","45 min","Casual"]},
+      {id:"s2",name:"Hair Coloring",duration:"90 min",price:85,tags:["Haircut","90 min","Professional"]},
+      {id:"s3",name:"Facial Treatment",duration:"60 min",price:50,tags:["Facial","60 min","Relaxing"]},
+      {id:"s4",name:"Manicure & Pedicure",duration:"45 min",price:40,tags:["Nails","45 min","Beauty"]},
+      {id:"s5",name:"Massage Therapy",duration:"60 min",price:65,tags:["Massage","60 min","Wellness"]},
+    ],
+    reviewsList:[
+      {name:"Sophie A.",rating:5,text:"Amazing salon! The coloring was perfect and the staff was so friendly.",date:"Apr 2025"},
+      {name:"Mia L.",rating:5,text:"Best haircut I've had in years. Will definitely come back!",date:"Mar 2025"},
+    ]
+  },
+  { id:2, name:"Bella Beauty Bar", emoji:"💅", rating:4.7, reviews:182, address:"217 St 217, Veal Vong, 7 Makara, Phnom Penh", hours:"10:00 AM – 8:00 PM", tags:["Nails","Lashes","Brows"], photos:["💅","👁️","✨"],
+    services:[
+      {id:"s6",name:"Gel Manicure",duration:"60 min",price:45,tags:["Nails","Gel","Premium"]},
+      {id:"s7",name:"Lash Extensions",duration:"90 min",price:95,tags:["Lashes","90 min","Volume"]},
+      {id:"s8",name:"Brow Shaping",duration:"30 min",price:30,tags:["Brows","30 min","Quick"]},
+    ],
+    reviewsList:[{name:"Emma K.",rating:4,text:"Great nail service, very clean and professional.",date:"Apr 2025"}]
+  },
+  { id:3, name:"Zen Wellness Spa", emoji:"🧘", rating:4.8, reviews:316, address:"113 Norodom Blvd, BKK1, Chamkarmon, Phnom Penh", hours:"8:00 AM – 9:00 PM", tags:["Spa","Massage","Facial"], photos:["🧘","💆","🌿"],
+    services:[
+      {id:"s9",name:"Deep Tissue Massage",duration:"60 min",price:80,tags:["Massage","60 min","Therapeutic"]},
+      {id:"s10",name:"Hydrating Facial",duration:"75 min",price:90,tags:["Facial","75 min","Luxury"]},
+      {id:"s11",name:"Hot Stone Therapy",duration:"90 min",price:110,tags:["Spa","90 min","Relaxing"]},
+    ],
+    reviewsList:[{name:"Lisa T.",rating:5,text:"Absolutely divine! The hot stone therapy changed my life.",date:"Apr 2025"}]
+  },
+  { id:4, name:"Curls & Co.", emoji:"🌀", rating:4.6, reviews:97, address:"51 St 51, Srah Chak, Daun Penh, Phnom Penh", hours:"10:00 AM – 6:00 PM", tags:["Curly Hair","Natural Hair","Braids"], photos:["🌀","💇‍♀️","✂️"],
+    services:[
+      {id:"s12",name:"Curly Cut",duration:"60 min",price:55,tags:["Curly","60 min","Specialty"]},
+      {id:"s13",name:"Braid Styling",duration:"120 min",price:75,tags:["Braids","120 min","Natural"]},
+    ],
+    reviewsList:[{name:"Nia B.",rating:5,text:"Finally a salon that knows how to work with natural hair!",date:"Mar 2025"}]
+  },
+  { id:5, name:"Glow Up Studio", emoji:"✨", rating:4.9, reviews:203, address:"159 Sisowath Quay, Wat Phnom, Daun Penh, Phnom Penh", hours:"9:00 AM – 8:00 PM", tags:["Makeup","Skincare","Waxing"], photos:["✨","💄","🌟"],
+    services:[
+      {id:"s14",name:"Bridal Makeup",duration:"120 min",price:150,tags:["Makeup","Bridal","Luxury"]},
+      {id:"s15",name:"Express Facial",duration:"30 min",price:35,tags:["Skincare","30 min","Quick"]},
+    ],
+    reviewsList:[{name:"Priya S.",rating:5,text:"The bridal makeup was absolutely stunning. Exceeded all expectations!",date:"Apr 2025"}]
+  },
+  { id:6, name:"Luxe Hair Lounge", emoji:"👸", rating:4.8, reviews:175, address:"430 Monivong Blvd, Tonle Bassac, Chamkarmon, Phnom Penh", hours:"9:00 AM – 7:00 PM", tags:["Blowout","Extensions","Keratin"], photos:["👸","💁","💎"],
+    services:[
+      {id:"s16",name:"Blowout",duration:"45 min",price:55,tags:["Blowout","45 min","Styling"]},
+      {id:"s17",name:"Keratin Treatment",duration:"180 min",price:200,tags:["Keratin","3 hrs","Smoothing"]},
+      {id:"s18",name:"Hair Extensions",duration:"240 min",price:350,tags:["Extensions","4 hrs","Premium"]},
+    ],
+    reviewsList:[{name:"Chloe M.",rating:5,text:"The keratin treatment was amazing! My hair has never been so smooth.",date:"Mar 2025"}]
+  },
+  { id:7, name:"The Color Bar", emoji:"🎨", rating:4.5, reviews:143, address:"289 St 289, Boeung Salang, Toul Kork, Phnom Penh", hours:"10:00 AM – 7:00 PM", tags:["Coloring","Balayage","Highlights"], photos:["🎨","🌈","✂️"],
+    services:[
+      {id:"s19",name:"Balayage",duration:"180 min",price:180,tags:["Color","3 hrs","Specialty"]},
+      {id:"s20",name:"Full Highlights",duration:"120 min",price:130,tags:["Highlights","2 hrs","Color"]},
+    ],
+    reviewsList:[{name:"Alex P.",rating:4,text:"Great balayage result! The stylist really understood what I wanted.",date:"Apr 2025"}]
+  },
+  { id:8, name:"Nails & Beyond", emoji:"💅", rating:4.7, reviews:211, address:"63 St 63, Boeung Trabek, Chamkarmon, Phnom Penh", hours:"9:30 AM – 8:30 PM", tags:["Nails","Gel","Acrylic"], photos:["💅","💎","✨"],
+    services:[
+      {id:"s21",name:"Acrylic Full Set",duration:"90 min",price:65,tags:["Acrylic","90 min","Full Set"]},
+      {id:"s22",name:"Nail Art",duration:"60 min",price:45,tags:["Art","60 min","Custom"]},
+    ],
+    reviewsList:[{name:"Jamie K.",rating:5,text:"The nail art was incredible! So detailed and long-lasting.",date:"Apr 2025"}]
+  },
+];
+
+const TIMES = ["9:00 AM","9:15 AM","9:30 AM","9:45 AM","10:00 AM","10:15 AM","10:30 AM","10:45 AM","11:00 AM","11:15 AM","11:30 AM","11:45 AM","12:00 PM","12:15 PM","12:30 PM","12:45 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM"];
+const BOOKED_TIMES = ["9:00 AM","10:15 AM","11:30 AM","2:00 PM"];
+const BLOCKED_TIMES = ["12:00 PM","12:15 PM","12:30 PM","12:45 PM"];
+
+
+const TRANSLATIONS = {
+  en: {
+    salonOwner:"Salon Owner?", heroLine1:"Book your next", heroLine2:"beauty appointment.",
+    heroSub:"Skip the phone calls. Find available times and book instantly with salons near you.",
+    search:"Search", allSalons:"All Salons", nearMe:"Near Me", popular:"Popular",
+    priceFilter:"Price", serviceFilter:"Service", priceRange:"Price Range",
+    selectService:"Select Service", salonsFound:"salons found", back:"Back",
+    services:"Services", reviews:"Reviews", writeReview:"Write Review",
+    walkinAvailable:"Walk-ins currently available", bookNow:"Book Now",
+    changeService:"Change service", yourInfo:"Your Info", namePh:"Full name",
+    phonePh:"Phone number", groupBooking:"Group booking", selectDate:"Select Date",
+    selectTime:"Select a time", available:"Available", booked:"Booked",
+    blocked:"Blocked", selected:"Selected", depositTitle:"No-Show Protection",
+    depositDesc:"A $5 deposit is required to confirm your booking. This will be deducted from your service total. Cancelling within 2h of appointment forfeits the deposit.",
+    continueConfirm:"Continue to Confirm →", confirmBooking:"Confirm Booking",
+    bookingSummary:"Booking Summary", salon:"Salon", service:"Service",
+    dateTime:"Date & Time", customer:"Customer", guests:"Guests",
+    servicePrice:"Service Price", depositRequired:"Deposit Required",
+    totalDue:"Total Due Now", payDeposit:"Pay Deposit",
+    bookingConfirmed:"Booking Confirmed!", bookingConfirmedSub:"Your appointment has been booked. See you soon!",
+    myBookings:"My Bookings", backHome:"Home", reschedule:"Reschedule",
+    cancel:"Cancel", overview:"Overview", schedule:"Schedule", bookings:"Bookings",
+    noShows:"No-Shows", settings:"Settings", todayBookings:"Today's Bookings",
+    todayRevenue:"Today's Revenue", noShowCount:"No-Shows", avgRating:"Avg Rating",
+    upcomingToday:"Upcoming Today", walkinMode:"Walk-in Mode",
+    walkinDesc:"Accept walk-in customers during slow periods",
+    manageSchedule:"Manage Schedule", blockTime:"Block Time",
+    allBookings:"All Bookings", noShowProtection:"No-Show Protection",
+    depositSystem:"Deposit System", depositSystemDesc:"Require customers to pay a deposit to confirm bookings",
+    depositAmount:"Deposit Amount ($)", cancelWindow:"Free Cancellation Window (hours)",
+    recentNoShows:"Recent No-Shows", salonSettings:"Salon Settings",
+    salonName:"Salon Name", address:"Address", openTime:"Open Time",
+    closeTime:"Close Time", importCustomers:"Import Customer List",
+    uploadCSV:"Upload CSV file to import customers", saveSettings:"Save Settings",
+    submitReview:"Submit Review", reviewPh:"Share your experience...",
+    newDate:"New Date", newTime:"New Time", confirmReschedule:"Confirm Reschedule",
+    blockTimeSlot:"Block Time Slot", reason:"Reason", staffBreak:"Staff Break",
+    personalTime:"Personal Time", maintenance:"Maintenance", other:"Other",
+    startTime:"Start Time", endTime:"End Time", blockConfirm:"Block These Times",
+    searchPh:"Search salons, services...", sortRating:"⭐ Top Rated",
+    confirm:"Confirm", bookNowArrow:"Book Now →", reviewsSuffix:"reviews",
+    dashboard:"Dashboard", appointments:"Appointments", staffNav:"Staff", logout:"Logout",
+    totalStaff:"Total Staff", availableNow:"Available Now",
+    statusAvailable:"Available", statusBusy:"Busy", statusOff:"Off",
+    statusConfirmed:"Confirmed", statusRescheduled:"Rescheduled", statusCancelled:"Cancelled",
+    cancelConfirmQ:"Cancel this booking?", yesCancel:"Yes, Cancel", keepIt:"Keep It",
+    leaveReview:"Leave a Review",
+    depositForfeit:"You are within 2 hours of your appointment — your $5 deposit will be forfeited.",
+    noCancelCharge:"You are outside the 2-hour window — no deposit will be charged.",
+    noSalonsFound:"No salons found",
+    noUpcoming:"No upcoming appointments", noUpcomingSub:"Browse salons and book your next session.",
+    noPast:"No past bookings yet", noPastSub:"Your completed appointments will appear here.",
+    noCancelled:"No cancelled bookings", noCancelledSub:"Good news — nothing was cancelled!",
+    addServiceTitle:"Add New Service", addStaffTitle:"Add New Staff",
+    serviceName:"Service Name", categoryLabel:"Category", priceLabel:"Price ($)", durationLabel:"Duration (min)",
+    fullName:"Full Name", roleTitle:"Role / Title", skillsLabel:"Skills (comma-separated)",
+    statusLabel:"Status", addServiceBtn:"Add Service", addStaffMemberBtn:"Add Staff Member",
+    durMin:"min", durHrs:"hrs",
+    svc_s1:"Haircut & Style", svc_s2:"Hair Coloring", svc_s3:"Facial Treatment",
+    svc_s4:"Manicure & Pedicure", svc_s5:"Massage Therapy", svc_s6:"Gel Manicure",
+    svc_s7:"Lash Extensions", svc_s8:"Brow Shaping", svc_s9:"Deep Tissue Massage",
+    svc_s10:"Hydrating Facial", svc_s11:"Hot Stone Therapy", svc_s12:"Curly Cut",
+    svc_s13:"Braid Styling", svc_s14:"Bridal Makeup", svc_s15:"Express Facial",
+    svc_s16:"Blowout", svc_s17:"Keratin Treatment", svc_s18:"Hair Extensions",
+    svc_s19:"Balayage", svc_s20:"Full Highlights", svc_s21:"Acrylic Full Set", svc_s22:"Nail Art",
+    // Landing page
+    lp_heroTag:"✨ Trusted by 500+ salons in Cambodia",
+    lp_hero1:"Better Booking.", lp_hero2:"Better Business.",
+    lp_heroSub:"Skip the phone calls. Find salons near you, pick a time, and book instantly. For salon owners — fill your chair every hour.",
+    lp_findSalon:"💇 Find a Salon", lp_listSalon:"🏪 List Your Salon",
+    lp_statSalons:"Salons", lp_statBookings:"Bookings", lp_statRating:"Avg Rating",
+    lp_liveBooking:"Live Booking", lp_mockupBtn:"🎉 Book Now — $35",
+    lp_mockupFoot:"Instant confirmation · No phone calls",
+    lp_simpleTag:"Simple Process", lp_howTitle:"How It Works",
+    lp_howSub:"Three steps between you and a fresh look.",
+    lp_step1Title:"Search", lp_step1Desc:"Browse 500+ salons by service, price, or location. Filter by rating, availability, or specialty.",
+    lp_step2Title:"Pick a Time", lp_step2Desc:"See real-time availability. Choose a date and time that fits your schedule — no back-and-forth.",
+    lp_step3Title:"Book Instantly", lp_step3Desc:"Confirm with a tap. Get instant confirmation and an automatic reminder before your appointment.",
+    lp_whyTag:"Why BookMySalon",
+    lp_featTitle1:"Everything you need,", lp_featTitle2:"nothing you don't",
+    lp_feat1Title:"AI-Powered Search", lp_feat1Desc:"Smart filters match you to the right salon by service type, price range, and real-time slot availability.",
+    lp_feat2Title:"No-Show Protection", lp_feat2Desc:"A small deposit secures your slot. Salons reduce empty chairs; customers stay committed.",
+    lp_feat3Title:"Instant Confirmation", lp_feat3Desc:"No waiting, no phone tag. Book and receive confirmation immediately, with a reminder before your visit.",
+    lp_feat4Title:"Khmer + English", lp_feat4Desc:"Fully bilingual. Switch between English and ភាសាខ្មែរ at any time with one tap.",
+    lp_feat5Title:"Group Booking", lp_feat5Desc:"Coming with friends? Book for 2–4 people at once. One reservation, everyone sorted.",
+    lp_feat6Title:"Cancel & Reschedule", lp_feat6Desc:"Life happens. Reschedule with a tap or cancel within the free window — all from My Bookings.",
+    lp_custLoveTag:"Customer Love", lp_custTitle:"What our customers say",
+    lp_rev1:'"I used to spend 20 minutes on the phone just to book a haircut. Now it takes 30 seconds. Total game-changer."',
+    lp_rev1Name:"Sophie A.", lp_rev1City:"Phnom Penh",
+    lp_rev2:'"The deposit system is brilliant. No more no-shows ruining our schedule. Revenue is up 30% since we joined."',
+    lp_rev2Name:"Mia — Salon Owner", lp_rev2City:"Siem Reap",
+    lp_rev3:'"I love that I can see real-time availability and book in Khmer. Finally an app built for us!"',
+    lp_rev3Name:"Priya S.", lp_rev3City:"Battambang",
+    lp_ctaTitle:"Ready to book?", lp_ctaSub:"Join 12,000+ customers who never call a salon again.",
+    lp_ctaBtn1:"💇 Find a Salon Near You →", lp_ctaBtn2:"🏪 List Your Salon",
+    // Pricing page
+    pkg_tag:"Pricing Packages", pkg_title:"Choose the Right Plan for Your Beauty Business",
+    pkg_sub:"Simple pricing for normal salons, with custom solutions for beauty clinics and multi-branch businesses.",
+    pkg_proTitle:"Pro Plan", pkg_proSub:"For normal salons & barbershops", pkg_perMonth:"/ month",
+    pkg_proF1:"Appointment booking calendar", pkg_proF2:"Automatic customer reminders",
+    pkg_proF3:"Customer database & visit history", pkg_proF4:"Staff-based scheduling",
+    pkg_proF5:"Facebook / Telegram booking link", pkg_proF6:"Basic reports",
+    pkg_proValue:"Best for salons that want to organize bookings, reduce no-shows, and manage daily operations easily.",
+    pkg_proBtn:"Start with Pro",
+    pkg_badge:"Custom Solution", pkg_clinicTitle:"Clinic / Multi-Branch Plan",
+    pkg_clinicSub:"For beauty clinics & businesses with many branches",
+    pkg_customPrice:"Custom", pkg_basedOn:"based on branches",
+    pkg_clinicF1:"Everything in Pro Plan", pkg_clinicF2:"Multi-branch management",
+    pkg_clinicF3:"Role-based access for teams", pkg_clinicF4:"Advanced automatic reminders",
+    pkg_clinicF5:"Deposit & package tracking", pkg_clinicF6:"Advanced analytics by branch",
+    pkg_clinicF7:"Priority onboarding & support",
+    pkg_clinicValue:"Pricing depends on number of branches, staff users, and feature requirements.",
+    pkg_clinicBtn:"Request Custom Quote",
+  },
+  km: {
+    salonOwner:"ម្ចាស់សាឡុង?", heroLine1:"កក់ការណាត់ជួប", heroLine2:"សម្រស់បន្ទាប់របស់អ្នក",
+    heroSub:"មិនចាំបាច់ទូរស័ព្ទ។ ស្វែងរកពេលទំនេរ ហើយកក់ភ្លាមៗ។",
+    search:"ស្វែងរក", allSalons:"សាឡុងទាំងអស់", nearMe:"នៅជិតខ្ញុំ", popular:"ពេញនិយម",
+    priceFilter:"តម្លៃ", serviceFilter:"សេវាកម្ម", priceRange:"ជួរតម្លៃ",
+    selectService:"ជ្រើសសេវាកម្ម", salonsFound:"សាឡុងត្រូវបានរកឃើញ", back:"ត្រឡប់",
+    services:"សេវាកម្ម", reviews:"មតិ", writeReview:"សរសេរមតិ",
+    walkinAvailable:"ទទួលភ្ញៀវវគ្មានការណាត់ជួប", bookNow:"កក់ឥឡូវ",
+    changeService:"ផ្លាស់ប្ដូរសេវាកម្ម", yourInfo:"ព័ត៌មានរបស់អ្នក",
+    namePh:"ឈ្មោះពេញ", phonePh:"លេខទូរស័ព្ទ", groupBooking:"កក់ជាក្រុម",
+    selectDate:"ជ្រើសកាលបរិច្ឆេទ", selectTime:"ជ្រើសម៉ោង",
+    available:"ទំនេរ", booked:"បានកក់", blocked:"ផ្អាក", selected:"ជ្រើស",
+    depositTitle:"ការការពារការខកខាន", depositDesc:"ត្រូវការប្រាក់កក $5 ដើម្បីបញ្ជាក់ការណាត់ជួប",
+    continueConfirm:"បន្តដើម្បីបញ្ជាក់ →", confirmBooking:"បញ្ជាក់ការកក់",
+    bookingSummary:"សង្ខេបការកក់", salon:"សាឡុង", service:"សេវាកម្ម",
+    dateTime:"ម៉ោងនិងកាលបរិច្ឆេទ", customer:"អតិថិជន", guests:"ភ្ញៀវ",
+    servicePrice:"តម្លៃសេវា", depositRequired:"ប្រាក់កកជាំ",
+    totalDue:"សរុបត្រូវបង់", payDeposit:"បង់ប្រាក់កក",
+    bookingConfirmed:"បញ្ជាក់ការណាត់ជួបរួចហើយ!", bookingConfirmedSub:"ការណាត់ជួបរបស់អ្នកត្រូវបានកក់។",
+    myBookings:"ការកក់របស់ខ្ញុំ", backHome:"ទំព័រដើម", reschedule:"ចាត់ការណ៍ម្ដងទៀត",
+    cancel:"លុបចោល", overview:"ទិដ្ឋភាពរួម", schedule:"កាលវិភាគ", bookings:"ការកក់",
+    noShows:"ការខកខាន", settings:"ការកំណត់", todayBookings:"ការណាត់ជួបថ្ងៃនេះ",
+    todayRevenue:"ចំណូលថ្ងៃនេះ", noShowCount:"ការខកខាន", avgRating:"ពិន្ទុមធ្យម",
+    upcomingToday:"ខាងមុខថ្ងៃនេះ", walkinMode:"របៀបភ្ញៀវគ្មានណាត់",
+    walkinDesc:"ទទួលអតិថិជនដោយគ្មានការណាត់ជួបក្នុងអំឡុងពេលស្ងប់ស្ងាត់",
+    manageSchedule:"គ្រប់គ្រងកាលវិភាគ", blockTime:"ចាក់ស្ទះពេល",
+    allBookings:"ការកក់ទាំងអស់", noShowProtection:"ការការពារការខកខាន",
+    depositSystem:"ប្រព័ន្ធប្រាក់កក", depositSystemDesc:"ទាមទារអតិថិជនបង់ប្រាក់កក",
+    depositAmount:"ចំនួនប្រាក់កក ($)", cancelWindow:"ពេលលុបចោលដោយឥតគិតថ្លៃ (ម៉ោង)",
+    recentNoShows:"ការខកខានថ្មីៗ", salonSettings:"ការកំណត់សាឡុង",
+    salonName:"ឈ្មោះសាឡុង", address:"អាសយដ្ឋាន", openTime:"ម៉ោងបើក", closeTime:"ម៉ោងបិទ",
+    importCustomers:"នាំចូលបញ្ជីអតិថិជន", uploadCSV:"បង្ហោះឯកសារ CSV",
+    saveSettings:"រក្សាទុកការកំណត់", submitReview:"ដាក់ស្នើមតិ",
+    reviewPh:"ចែករំលែកបទពិសោធន៍របស់អ្នក...", newDate:"កាលបរិច្ឆេទថ្មី",
+    newTime:"ម៉ោងថ្មី", confirmReschedule:"បញ្ជាក់ការចាត់ការណ៍ម្ដងទៀត",
+    blockTimeSlot:"ចាក់ស្ទះពេល", reason:"មូលហេតុ", staffBreak:"ល្មមស្ថិត",
+    personalTime:"ពេលផ្ទាល់ខ្លួន", maintenance:"ថែទាំ", other:"ផ្សេងៗ",
+    startTime:"ម៉ោងចាប់ផ្ដើម", endTime:"ម៉ោងបញ្ចប់", blockConfirm:"ចាក់ស្ទះពេលទាំងនេះ",
+    searchPh:"ស្វែងរកសាឡុង, សេវាកម្ម...", sortRating:"⭐ ពិន្ទុខ្ពស់",
+    confirm:"បញ្ជាក់", bookNowArrow:"កក់ឥឡូវ →", reviewsSuffix:"មតិ",
+    dashboard:"ផ្ទាំងគ្រប់គ្រង", appointments:"ការណាត់ជួប", staffNav:"បុគ្គលិក", logout:"ចេញ",
+    totalStaff:"បុគ្គលិកសរុប", availableNow:"ទំនេរឥឡូវ",
+    statusAvailable:"ទំនេរ", statusBusy:"រវល់", statusOff:"ឈប់សម្រាក",
+    statusConfirmed:"បានបញ្ជាក់", statusRescheduled:"ចាត់ការណ៍ម្ដងទៀត", statusCancelled:"បានលុបចោល",
+    cancelConfirmQ:"លុបការកក់នេះ?", yesCancel:"បាទ/ចាស លុបចោល", keepIt:"រក្សា",
+    leaveReview:"ដាក់មតិ",
+    depositForfeit:"អ្នកនៅក្នុង ២ ម៉ោងមុនការណាត់ — ប្រាក់កក $5 នឹងត្រូវបាត់បង់។",
+    noCancelCharge:"អ្នកនៅក្រៅពេល ២ ម៉ោង — គ្មានការកាត់ប្រាក់កក។",
+    noSalonsFound:"រកសាឡុងមិនឃើញ",
+    noUpcoming:"គ្មានការណាត់ជួបខាងមុខ", noUpcomingSub:"រកសាឡុង ហើយកក់វគ្គបន្ទាប់របស់អ្នក។",
+    noPast:"គ្មានការណាត់ជួបកន្លងទៅ", noPastSub:"ការណាត់ជួបដែលបានបញ្ចប់នឹងបង្ហាញនៅទីនេះ។",
+    noCancelled:"គ្មានការណាត់ជួបដែលបានលុប", noCancelledSub:"ល្អ — គ្មានអ្វីបានលុបចោល!",
+    addServiceTitle:"បន្ថែមសេវាកម្មថ្មី", addStaffTitle:"បន្ថែមបុគ្គលិកថ្មី",
+    serviceName:"ឈ្មោះសេវាកម្ម", categoryLabel:"ប្រភេទ", priceLabel:"តម្លៃ ($)", durationLabel:"រយៈពេល (នាទី)",
+    fullName:"ឈ្មោះពេញ", roleTitle:"តួនាទី", skillsLabel:"ជំនាញ (ដាក់ក្បៀសបំបែក)",
+    statusLabel:"ស្ថានភាព", addServiceBtn:"បន្ថែមសេវាកម្ម", addStaffMemberBtn:"បន្ថែមបុគ្គលិក",
+    durMin:"នាទី", durHrs:"ម៉ោង",
+    svc_s1:"កាត់សក់ & រចនា", svc_s2:"ការជ្រលក់ពណ៌សក់", svc_s3:"ការព្យាបាលមុខ",
+    svc_s4:"ម៉ានីគ្យួរ & ប៉េឌីគ្យួរ", svc_s5:"ការព្យាបាលម៉ាស្សា", svc_s6:"ម៉ានីគ្យួរជែល",
+    svc_s7:"ការបន្ថែមរោមភ្លែត", svc_s8:"ការរចនាចិញ្ចើម", svc_s9:"ម៉ាស្សាជ្រៅ",
+    svc_s10:"ការព្យាបាលមុខសំណើម", svc_s11:"ការព្យាបាលដោយថ្មក្ដៅ", svc_s12:"កាត់សក់រំកិល",
+    svc_s13:"រចនាសក់ខ្សែ", svc_s14:"វិចិត្រអាពាហ៍ពិពាហ៍", svc_s15:"ការព្យាបាលមុខរហ័ស",
+    svc_s16:"ហ្វូនសក់", svc_s17:"ការព្យាបាលសក់ Keratin", svc_s18:"ការបន្ថែមសក់",
+    svc_s19:"Balayage", svc_s20:"ការដុតផ្នែករំលេច", svc_s21:"ការដាក់ Acrylic ពេញ", svc_s22:"សិល្បៈក្រចក",
+    // Landing page
+    lp_heroTag:"✨ ទុកចិត្តដោយសាឡុងជាង ៥០០ នៅកម្ពុជា",
+    lp_hero1:"ការកក់ប្រសើរជាងមុន។", lp_hero2:"អាជីវកម្មប្រសើរជាងមុន។",
+    lp_heroSub:"មិនចាំបាច់ទូរស័ព្ទ។ ស្វែងរកសាឡុងនៅជិតអ្នក ជ្រើសរើសពេលវេលា ហើយកក់ភ្លាមៗ។",
+    lp_findSalon:"💇 រកសាឡុង", lp_listSalon:"🏪 ចុះបញ្ជីសាឡុងរបស់អ្នក",
+    lp_statSalons:"សាឡុង", lp_statBookings:"ការកក់", lp_statRating:"ពិន្ទុមធ្យម",
+    lp_liveBooking:"ការកក់ផ្ទាល់", lp_mockupBtn:"🎉 កក់ឥឡូវ — $35",
+    lp_mockupFoot:"បញ្ជាក់ភ្លាម · គ្មានការទូរស័ព្ទ",
+    lp_simpleTag:"ដំណើរការងាយស្រួល", lp_howTitle:"របៀបប្រើប្រាស់",
+    lp_howSub:"បីជំហានរវាងអ្នក និងរូបរាងស្រស់ស្អាត។",
+    lp_step1Title:"ស្វែងរក", lp_step1Desc:"រកមើលសាឡុងជាង ៥០០ តាមសេវាកម្ម តម្លៃ ឬទីតាំង។ ត្រងតាមការវាយតម្លៃ ភាពទំនេរ ឬជំនាញ។",
+    lp_step2Title:"ជ្រើសពេល", lp_step2Desc:"មើលភាពទំនេរពេលវេលាពិតប្រាកដ។ ជ្រើសកាលបរិច្ឆេទ និងម៉ោងដែលសមស្រប — គ្មានការសួរ-ឆ្លើយ។",
+    lp_step3Title:"កក់ភ្លាម", lp_step3Desc:"បញ្ជាក់ដោយការចុច។ ទទួលការបញ្ជាក់ភ្លាម ជាមួយការរំលឹកដោយស្វ័យប្រវត្តិ។",
+    lp_whyTag:"ហេតុអ្វីជ្រើស BookMySalon",
+    lp_featTitle1:"អ្វីគ្រប់យ៉ាងដែលអ្នកត្រូវការ", lp_featTitle2:"គ្មានអ្វីដែលអ្នកមិនត្រូវការ",
+    lp_feat1Title:"ការស្វែងរកដោយ AI", lp_feat1Desc:"ការត្រងឆ្លាតវៃភ្ជាប់អ្នកទៅសាឡុងត្រឹមត្រូវ តាមប្រភេទសេវា ជួរតម្លៃ និងភាពទំនេរ។",
+    lp_feat2Title:"ការការពារការខកខាន", lp_feat2Desc:"ប្រាក់កកតូចធានាកន្លែងរបស់អ្នក។ សាឡុងបន្ថយកន្លែងទំនេរ; អតិថិជននៅតែប្តេជ្ញា។",
+    lp_feat3Title:"ការបញ្ជាក់ភ្លាម", lp_feat3Desc:"គ្មានការរង់ចាំ។ កក់ ហើយទទួលការបញ្ជាក់ភ្លាម ជាមួយការរំលឹកមុនការមក។",
+    lp_feat4Title:"ខ្មែរ + អង់គ្លេស", lp_feat4Desc:"ពីរភាសាពេញលេញ។ ប្ដូររវាងភាសាអង់គ្លេស និងភាសាខ្មែរ នៅពេលណាក៏បាន។",
+    lp_feat5Title:"ការកក់ជាក្រុម", lp_feat5Desc:"មកជាមួយមិត្ត? កក់សម្រាប់ ២-៤ នាក់ក្នុងដំណើរតែមួយ។",
+    lp_feat6Title:"លុបចោល & ចាត់ការណ៍ម្ដងទៀត", lp_feat6Desc:"ជីវិតកើតឡើង។ ចាត់ការណ៍ម្ដងទៀតដោយការចុច ឬលុបចោលក្នុងពេលដោយឥតគិតថ្លៃ។",
+    lp_custLoveTag:"ការស្រឡាញ់អតិថិជន", lp_custTitle:"អតិថិជនរបស់យើងនិយាយអ្វី",
+    lp_rev1:'"ខ្ញុំធ្លាប់ចំណាយ ២០ នាទីនៅលើទូរស័ព្ទដើម្បីកក់ការកាត់សក់។ ឥឡូវចំណាយ ៣០ វិនាទី។ ប្ដូរហ្គេម!"',
+    lp_rev1Name:"Sophie A.", lp_rev1City:"ភ្នំពេញ",
+    lp_rev2:'"ប្រព័ន្ធប្រាក់កកល្អណាស់។ គ្មានការខកខានបន្ថែមទៀតដែលបំផ្លាញកាលវិភាគ។ ចំណូលកើនឡើង ៣០% !"',
+    lp_rev2Name:"Mia — ម្ចាស់សាឡុង", lp_rev2City:"សៀមរាប",
+    lp_rev3:'"ខ្ញុំចូលចិត្តដែលអាចមើលភាពទំនេរ ហើយកក់ជាភាសាខ្មែរ។ ជាអប្បបរមាសម្រាប់យើង!"',
+    lp_rev3Name:"Priya S.", lp_rev3City:"បាត់ដំបង",
+    lp_ctaTitle:"ត្រៀមកក់ហើយឬ?", lp_ctaSub:"ចូលរួមជាមួយអតិថិជនជាង ១២,០០០ នាក់ ដែលមិនទូរស័ព្ទហៅសាឡុងទៀតឡើយ។",
+    lp_ctaBtn1:"💇 រកសាឡុងនៅជិតអ្នក →", lp_ctaBtn2:"🏪 ចុះបញ្ជីសាឡុងរបស់អ្នក",
+    // Pricing page
+    pkg_tag:"កញ្ចប់តម្លៃ", pkg_title:"ជ្រើសរើសផែនការត្រឹមត្រូវសម្រាប់អាជីវកម្មសម្រស់របស់អ្នក",
+    pkg_sub:"តម្លៃសាមញ្ញសម្រាប់សាឡុងធម្មតា ជាមួយដំណោះស្រាយផ្ទាល់ខ្លួនសម្រាប់គ្លីនិកសម្រស់ និងអាជីវកម្មច្រើនសាខា។",
+    pkg_proTitle:"ផែនការ Pro", pkg_proSub:"សម្រាប់សាឡុងធម្មតា & ហាងកាត់សក់", pkg_perMonth:"/ ខែ",
+    pkg_proF1:"ប្រតិទិនការកក់ការណាត់ជួប", pkg_proF2:"ការរំលឹកអតិថិជនដោយស្វ័យប្រវត្តិ",
+    pkg_proF3:"មូលដ្ឋានទិន្នន័យអតិថិជន & ប្រវត្តិការមក", pkg_proF4:"ការចាត់ការណ៍ពេលតាមបុគ្គលិក",
+    pkg_proF5:"តំណភ្ជាប់ការកក់ Facebook / Telegram", pkg_proF6:"របាយការណ៍មូលដ្ឋាន",
+    pkg_proValue:"សមល្អបំផុតសម្រាប់សាឡុងដែលចង់រៀបចំការកក់ បន្ថយការខកខាន និងគ្រប់គ្រងប្រចាំថ្ងៃបានងាយស្រួល។",
+    pkg_proBtn:"ចាប់ផ្ដើមជាមួយ Pro",
+    pkg_badge:"ដំណោះស្រាយផ្ទាល់ខ្លួន", pkg_clinicTitle:"ផែនការគ្លីនិក / ច្រើនសាខា",
+    pkg_clinicSub:"សម្រាប់គ្លីនិកសម្រស់ & អាជីវកម្មដែលមានច្រើនសាខា",
+    pkg_customPrice:"ផ្ទាល់ខ្លួន", pkg_basedOn:"អាស្រ័យលើចំនួនសាខា",
+    pkg_clinicF1:"អ្វីគ្រប់យ៉ាងនៅក្នុង Pro", pkg_clinicF2:"ការគ្រប់គ្រងច្រើនសាខា",
+    pkg_clinicF3:"ការចូលប្រើប្រាស់ផ្អែកលើតួនាទី", pkg_clinicF4:"ការរំលឹកដោយស្វ័យប្រវត្តិកម្រិតខ្ពស់",
+    pkg_clinicF5:"ការតាមដានប្រាក់កក & កញ្ចប់", pkg_clinicF6:"ការវិភាគកម្រិតខ្ពស់តាមសាខា",
+    pkg_clinicF7:"ការណែនាំ & គាំទ្រអាទិភាព",
+    pkg_clinicValue:"តម្លៃអាស្រ័យលើចំនួនសាខា អ្នកប្រើប្រាស់បុគ្គលិក និងតម្រូវការមុខងារ។",
+    pkg_clinicBtn:"ស្នើសុំតម្លៃផ្ទាល់ខ្លួន",
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  lang: 'en',
+  currentSalon: null,
+  currentService: null,
+  selectedTime: null,
+  selectedDate: null,
+  bookings: JSON.parse(localStorage.getItem('bms_bookings') || '[]'),
+  reviewStar: 5,
+  rescheduleId: null,
+  activeFilter: 'all',
+  serviceFilter: '',
+  maxPrice: 200,
+  walkin: false,
+  blockedOwnerSlots: [],
+};
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => {
+  seedDemoUsers();
+  renderSalons(SALONS);
+  buildDateStrip();
+  buildTimeGrid();
+  renderMyBookings();
+  applyLang();
+  updateNavAuth();
+  // Boot router: default to landing marketing page
+  navigate(location.hash || '#landing');
+};
+
+// ============================================================
+// ROUTER
+// ============================================================
+const SCREEN_TO_PAGE = {
+  'screen-home':       'page-salons',
+  'screen-salon':      'page-salon-id',
+  'screen-booking':    'page-salon-id',
+  'screen-confirm':    'page-confirm',
+  'screen-success':    'page-confirm',
+  'screen-mybookings': 'page-my-bookings',
+  'screen-owner':      'page-owner-dashboard',
+};
+
+const ROUTE_TO_SCREEN = {
+  '#salons':           'screen-home',
+  '#my-bookings':      'screen-mybookings',
+  '#owner-dashboard':  'screen-owner',
+  '#confirm':          'screen-confirm',
+};
+
+// These routes have their own page sections — no inner screen needed
+const PAGELESS_ROUTES = ['#landing', '#pricing', '#login', '#signup'];
+
+const PROTECTED_ROUTES = ['#salons', '#my-bookings', '#owner-dashboard', '#confirm'];
+
+function navigate(route) {
+  const hash = route.startsWith('#') ? route : '#' + route;
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+
+  if (!user && (PROTECTED_ROUTES.includes(hash) || hash.startsWith('#salon/'))) {
+    history.pushState(null, '', '#login');
+    _showPage('page-login');
+    return;
+  }
+
+  if (hash.startsWith('#salon/')) {
+    const id = parseInt(hash.split('/')[1]);
+    history.pushState(null, '', hash);
+    openSalon(id);
+    return;
+  }
+
+  history.pushState(null, '', hash);
+
+  if (PAGELESS_ROUTES.includes(hash)) {
+    const pageId = 'page-' + hash.slice(1);
+    _showPage(pageId);
+    return;
+  }
+
+  const screenId = ROUTE_TO_SCREEN[hash];
+  if (screenId) goTo(screenId);
+}
+
+window.onpopstate = () => navigate(location.hash || '#landing');
+
+function _showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId)?.classList.add('active');
+  const hideNav = pageId === 'page-owner-dashboard' || pageId === 'page-login' || pageId === 'page-signup';
+  document.getElementById('top-navbar').style.display = hideNav ? 'none' : '';
+  updateNavAuth();
+  window.scrollTo(0, 0);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goTo(screenId) {
+  const pageId = SCREEN_TO_PAGE[screenId] || 'page-landing';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId)?.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId)?.classList.add('active');
+  const hideNav = pageId === 'page-owner-dashboard' || pageId === 'page-login' || pageId === 'page-signup';
+  document.getElementById('top-navbar').style.display = hideNav ? 'none' : '';
+  updateNavAuth();
+  window.scrollTo(0, 0);
+  if (screenId === 'screen-mybookings') renderMyBookings();
+  if (screenId === 'screen-owner') renderOwnerDashboard();
+}
+
+// ============================================================
+// AUTH — seed, nav, login, signup, logout
+// ============================================================
+function seedDemoUsers() {
+  let users = JSON.parse(localStorage.getItem('bms_users') || 'null');
+  if (!users) {
+    users = [
+      { name: 'Demo Customer', email: 'customer@demo.com', password: 'demo123', role: 'customer' },
+      { name: 'Demo Owner',    email: 'owner@demo.com',    password: 'demo123', role: 'owner', salonId: 1 },
+    ];
+    localStorage.setItem('bms_users', JSON.stringify(users));
+  } else {
+    let changed = false;
+    users = users.map(u => { if (u.role === 'owner' && !u.salonId) { changed = true; return { ...u, salonId: 1 }; } return u; });
+    if (changed) localStorage.setItem('bms_users', JSON.stringify(users));
+  }
+  const cur = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  if (cur && cur.role === 'owner' && !cur.salonId) {
+    cur.salonId = 1;
+    localStorage.setItem('bms_user', JSON.stringify(cur));
+  }
+}
+
+function updateNavAuth() {
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const el = document.getElementById('nav-auth');
+  const salonsLink = document.getElementById('nav-salons-link');
+  const pricingLink = document.getElementById('nav-pricing-link');
+  if (salonsLink) salonsLink.style.display = user ? 'none' : '';
+  if (pricingLink) pricingLink.style.display = user ? 'none' : '';
+  if (user) {
+    const initial = (user.name || '?')[0].toUpperCase();
+    const isOwner = user.role === 'owner';
+    el.innerHTML = `
+      <span class="nav-avatar" title="${user.name}">${initial}</span>
+      ${isOwner
+        ? `<span class="nav-link" onclick="navigate('#owner-dashboard')">Dashboard</span>`
+        : `<span class="nav-link" onclick="navigate('#my-bookings')">My Bookings</span>`
+      }
+      <button onclick="doLogout()" class="border border-gray-200 text-gray-600 px-3 py-1.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">Logout</button>
+    `;
+  } else {
+    el.innerHTML = `
+      <span class="nav-link" onclick="navigate('#login')">Login</span>
+      <button onclick="navigate('#signup')" class="btn-primary px-4 py-2 rounded-xl text-sm">Sign Up</button>
+    `;
+  }
+}
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pw    = document.getElementById('loginPassword').value;
+  if (!email || !pw) { showToast('⚠️ Please fill in all fields', 'error'); return; }
+
+  const users = JSON.parse(localStorage.getItem('bms_users') || '[]');
+  const user  = users.find(u => u.email.toLowerCase() === email && u.password === pw);
+  if (!user) { showToast('❌ Incorrect email or password', 'error'); return; }
+
+  localStorage.setItem('bms_user', JSON.stringify(user));
+  updateNavAuth();
+  showToast(`👋 Welcome back, ${user.name}!`, 'success');
+  navigate(user.role === 'owner' ? '#owner-dashboard' : '#salons');
+}
+
+function doSignup() {
+  const name  = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const pw    = document.getElementById('signupPassword').value;
+  const role  = document.getElementById('signupRoleValue').value;
+
+  if (!name || !email || pw.length < 6) {
+    showToast('⚠️ Fill in all fields — password needs 6+ characters', 'error');
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem('bms_users') || '[]');
+  if (users.find(u => u.email.toLowerCase() === email)) {
+    showToast('⚠️ An account with that email already exists', 'error');
+    return;
+  }
+
+  const user = { name, email, password: pw, role };
+  users.push(user);
+  localStorage.setItem('bms_users', JSON.stringify(users));
+  localStorage.setItem('bms_user', JSON.stringify(user));
+  updateNavAuth();
+  showToast('🎉 Account created! Welcome, ' + name + '!', 'success');
+  navigate(role === 'owner' ? '#owner-dashboard' : '#salons');
+}
+
+function doLogout() {
+  localStorage.removeItem('bms_user');
+  updateNavAuth();
+  showToast('👋 See you next time!', 'success');
+  navigate('#landing');
+}
+
+function selectRole(role) {
+  document.getElementById('signupRoleValue').value = role;
+  document.querySelectorAll('.auth-role-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.role === role);
+  });
+}
+
+function quickDemo(role) {
+  const email = role === 'owner' ? 'owner@demo.com' : 'customer@demo.com';
+  document.getElementById('loginEmail').value = email;
+  document.getElementById('loginPassword').value = 'demo123';
+  doLogin();
+}
+
+// ============================================================
+// LANGUAGE
+// ============================================================
+function setLang(lang) {
+  state.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.lang-btn').forEach(b => { if(b.textContent.trim() === (lang==='en'?'EN':'ខ្មែរ')) b.classList.add('active'); });
+  applyLang();
+  // Re-render dynamic content so T() calls pick up new language
+  renderSalons(SALONS);
+  if (state.currentSalon) refreshSalonDetail(state.currentSalon);
+  renderMyBookings();
+  if (document.getElementById('staff-list') && !document.getElementById('ownerTab-staff').classList.contains('hidden')) renderStaffTab();
+  const svcGrid = document.getElementById('svc-grid');
+  if (svcGrid && !document.getElementById('ownerTab-services').classList.contains('hidden')) renderServicesTab('All');
+}
+
+function applyLang() {
+  const t = TRANSLATIONS[state.lang];
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-ph]').forEach(el => {
+    const key = el.getAttribute('data-ph');
+    if (t[key]) el.placeholder = t[key];
+  });
+}
+
+function T(key) { return TRANSLATIONS[state.lang][key] || key; }
+function Tdur(dur) { return dur.replace('min', T('durMin')).replace('hrs', T('durHrs')); }
+
+// ============================================================
+// SALONS
+// ============================================================
+function renderSalons(salons) {
+  const grid = document.getElementById('salonGrid');
+  document.getElementById('salonCount').textContent = salons.length;
+  if (!salons.length) { grid.innerHTML = `<div class="col-span-3 text-center py-16 text-gray-400"><div class="text-4xl mb-3">🔍</div><p>${T('noSalonsFound')}</p></div>`; return; }
+  grid.innerHTML = salons.map(s => `
+    <div class="card p-5 cursor-pointer fade-in" onclick="openSalon(${s.id})">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="salon-avatar">${s.emoji}</div>
+        <div>
+          <h3 class="font-bold text-gray-800">${s.name}</h3>
+          <div class="flex items-center gap-1"><span class="star text-sm">⭐</span><span class="font-semibold text-sm">${s.rating}</span><span class="text-gray-400 text-xs">(${s.reviews})</span></div>
+        </div>
+      </div>
+      <div class="text-gray-400 text-xs mb-1">📍 ${s.address}</div>
+      <div class="text-gray-400 text-xs mb-3">⏰ ${s.hours}</div>
+      <div class="flex flex-wrap gap-1 mb-3">${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      <div class="text-pink-500 text-sm font-semibold hover:underline">${T('bookNowArrow')}</div>
+    </div>
+  `).join('');
+}
+
+function openSalon(id) {
+  const salon = SALONS.find(s => s.id === id);
+  state.currentSalon = salon;
+  document.getElementById('detailName').textContent = salon.name;
+  document.getElementById('detailRating').textContent = salon.rating;
+  document.getElementById('detailReviews').textContent = `(${salon.reviews} ${T('reviewsSuffix')})`;
+  document.getElementById('detailAddress').textContent = salon.address;
+  document.getElementById('detailHours').textContent = salon.hours;
+  document.getElementById('reviewSalonName').textContent = salon.name;
+  
+  // Photos
+  document.getElementById('salonPhotos').innerHTML = salon.photos.map(p => `<div class="photo-thumb flex-shrink-0 w-32 flex items-center justify-center text-4xl">${p}</div>`).join('');
+  
+  // Services
+  document.getElementById('serviceList').innerHTML = salon.services.map(svc => `
+    <div class="card p-4 cursor-pointer hover:border-pink-200" onclick="selectService(${salon.id},'${svc.id}')">
+      <div class="flex items-center justify-between">
+        <div><p class="font-semibold text-gray-800">${T('svc_' + svc.id) || svc.name}</p><p class="text-gray-400 text-sm">${Tdur(svc.duration)}</p></div>
+        <span class="text-pink-500 font-bold text-lg">$${svc.price}</span>
+      </div>
+    </div>
+  `).join('');
+  
+  // Reviews
+  const stored = JSON.parse(localStorage.getItem(`bms_reviews_${id}`) || '[]');
+  const allReviews = [...salon.reviewsList, ...stored];
+  document.getElementById('reviewList').innerHTML = allReviews.map(r => `
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-semibold text-sm">${r.name}</span>
+        <span class="text-xs text-gray-400">${r.date}</span>
+      </div>
+      <div class="text-yellow-400 text-sm mb-1">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      <p class="text-gray-600 text-sm">${r.text}</p>
+    </div>
+  `).join('');
+
+  // Walk-in badge
+  if (salon.walkin) document.getElementById('walkinBadge').classList.remove('hidden');
+  else document.getElementById('walkinBadge').classList.add('hidden');
+
+  goTo('screen-salon');
+}
+
+function refreshSalonDetail(salon) {
+  if (!salon) return;
+  const el = document.getElementById('detailReviews');
+  if (el) el.textContent = `(${salon.reviews} ${T('reviewsSuffix')})`;
+  const svcList = document.getElementById('serviceList');
+  if (svcList) svcList.innerHTML = salon.services.map(svc => `
+    <div class="card p-4 cursor-pointer hover:border-pink-200" onclick="selectService(${salon.id},'${svc.id}')">
+      <div class="flex items-center justify-between">
+        <div><p class="font-semibold text-gray-800">${T('svc_' + svc.id) || svc.name}</p><p class="text-gray-400 text-sm">${Tdur(svc.duration)}</p></div>
+        <span class="text-pink-500 font-bold text-lg">$${svc.price}</span>
+      </div>
+    </div>
+  `).join('');
+  // Update booking screen service name/duration if visible
+  const bkSvc = document.getElementById('bkService');
+  if (bkSvc && state.currentService) {
+    bkSvc.textContent = T('svc_' + state.currentService.id) || state.currentService.name;
+    document.getElementById('bkDuration').textContent = Tdur(state.currentService.duration);
+  }
+}
+
+function selectService(salonId, svcId) {
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  if (!user) { navigate('#login'); return; }
+  const salon = SALONS.find(s => s.id === salonId);
+  const svc = salon.services.find(s => s.id === svcId);
+  state.currentService = svc;
+  
+  document.getElementById('bookingSalonName').textContent = salon.name;
+  document.getElementById('bookingRating').textContent = salon.rating;
+  document.getElementById('bookingReviews').textContent = `(${salon.reviews} ${T('reviewsSuffix')})`;
+  document.getElementById('bkService').textContent = T('svc_' + svc.id) || svc.name;
+  document.getElementById('bkDuration').textContent = Tdur(svc.duration);
+  document.getElementById('bkPrice').textContent = `$${svc.price}`;
+  document.getElementById('bkTags').innerHTML = svc.tags.map(t=>`<span class="tag text-xs">${t}</span>`).join('');
+  
+  setProgress(1);
+  buildTimeGrid();
+  goTo('screen-booking');
+  
+  // Show/hide group count
+  document.getElementById('groupBooking').addEventListener('change', function(){
+    document.getElementById('groupCount').classList.toggle('hidden', !this.checked);
+  });
+}
+
+function filterSalons() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const maxP = parseInt(document.querySelector('input[type=range]')?.value || 9999);
+  let filtered = SALONS.filter(s => {
+    const matchQ = !q || s.name.toLowerCase().includes(q) || s.tags.some(t => t.toLowerCase().includes(q));
+    const minPrice = Math.min(...s.services.map(sv=>sv.price));
+    const matchP = minPrice <= maxP;
+    const matchSvc = !state.serviceFilter || s.tags.some(t => t.toLowerCase().includes(state.serviceFilter.toLowerCase()));
+    return matchQ && matchP && matchSvc;
+  });
+  if (state.activeFilter === 'popular') filtered.sort((a,b) => b.reviews - a.reviews);
+  renderSalons(filtered);
+}
+
+function setFilter(f, btn) {
+  state.activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('priceFilterPanel').classList.add('hidden');
+  document.getElementById('serviceFilterPanel').classList.add('hidden');
+  filterSalons();
+}
+
+function setServiceFilter(svc) {
+  state.serviceFilter = svc;
+  filterSalons();
+}
+
+function sortSalons(by) {
+  let salons = [...SALONS];
+  if (by === 'rating') salons.sort((a,b) => b.rating - a.rating);
+  else if (by === 'price') salons.sort((a,b) => Math.min(...a.services.map(s=>s.price)) - Math.min(...b.services.map(s=>s.price)));
+  else if (by === 'name') salons.sort((a,b) => a.name.localeCompare(b.name));
+  renderSalons(salons);
+}
+
+function togglePriceFilter() {
+  const panel = document.getElementById('priceFilterPanel');
+  const btn = document.getElementById('filter-btn-price');
+  const opening = panel.classList.contains('hidden');
+  document.getElementById('serviceFilterPanel').classList.add('hidden');
+  document.getElementById('filter-btn-service').classList.remove('active');
+  panel.classList.toggle('hidden', !opening);
+  btn.classList.toggle('active', opening);
+  if (opening) document.querySelectorAll('.filter-btn').forEach(b => { if (b !== btn) b.classList.remove('active'); });
+}
+
+function toggleServiceFilter() {
+  const panel = document.getElementById('serviceFilterPanel');
+  const btn = document.getElementById('filter-btn-service');
+  const opening = panel.classList.contains('hidden');
+  document.getElementById('priceFilterPanel').classList.add('hidden');
+  document.getElementById('filter-btn-price').classList.remove('active');
+  panel.classList.toggle('hidden', !opening);
+  btn.classList.toggle('active', opening);
+  if (opening) document.querySelectorAll('.filter-btn').forEach(b => { if (b !== btn) b.classList.remove('active'); });
+}
+
+// ============================================================
+// DATE STRIP
+// ============================================================
+function buildDateStrip() {
+  const strip = document.getElementById('dateStrip');
+  const today = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    const isToday = i === 0;
+    html += `<div class="flex-shrink-0 w-14 text-center py-2 px-1 rounded-xl cursor-pointer transition-all border ${isToday ? 'bg-pink-500 text-white border-pink-500' : 'border-gray-200 bg-white hover:border-pink-300'}" onclick="selectDate(this, '${d.toDateString()}')">
+      <div class="text-xs font-medium">${days[d.getDay()]}</div>
+      <div class="text-lg font-bold">${d.getDate()}</div>
+    </div>`;
+  }
+  strip.innerHTML = html;
+  // Select today by default
+  state.selectedDate = today.toDateString();
+}
+
+function selectDate(el, dateStr) {
+  document.querySelectorAll('#dateStrip > div').forEach(d => {
+    d.className = d.className.replace('bg-pink-500 text-white border-pink-500','border-gray-200 bg-white');
+  });
+  el.className = el.className.replace('border-gray-200 bg-white','bg-pink-500 text-white border-pink-500');
+  state.selectedDate = dateStr;
+  state.selectedTime = null;
+  buildTimeGrid();
+}
+
+// ============================================================
+// TIME GRID
+// ============================================================
+function buildTimeGrid() {
+  const grid = document.getElementById('timeGrid');
+  grid.innerHTML = TIMES.map(t => {
+    const isBooked = BOOKED_TIMES.includes(t);
+    const isBlocked = BLOCKED_TIMES.includes(t);
+    const cls = isBooked ? 'time-slot booked' : isBlocked ? 'time-slot blocked' : 'time-slot';
+    const onclick = (!isBooked && !isBlocked) ? `onclick="selectTime(this, '${t}')"` : '';
+    return `<div class="${cls}" ${onclick}>${t}</div>`;
+  }).join('');
+}
+
+function selectTime(el, time) {
+  document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedTime = time;
+  setProgress(2);
+}
+
+function setProgress(step) {
+  ['ps1','ps2','ps3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'progress-step ' + (i+1 < step ? 'done' : i+1 === step ? 'current' : 'upcoming');
+  });
+}
+
+// ============================================================
+// BOOKING FLOW
+// ============================================================
+function proceedToConfirm() {
+  if (!state.selectedTime) { showToast('⚠️ Please select a time slot', 'error'); return; }
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  if (!name || !phone) { showToast('⚠️ Please fill in your name and phone', 'error'); return; }
+  
+  const isGroup = document.getElementById('groupBooking').checked;
+  const gCount = isGroup ? document.getElementById('groupCount').value : '1';
+
+  document.getElementById('cfSalon').textContent = state.currentSalon.name;
+  document.getElementById('cfService').textContent = T('svc_' + state.currentService.id) || state.currentService.name;
+  document.getElementById('cfDateTime').textContent = `${state.selectedDate || 'Today'}, ${state.selectedTime}`;
+  document.getElementById('cfCustomer').textContent = name;
+  document.getElementById('cfGuests').textContent = gCount + (gCount > 1 ? ' people' : ' person');
+  document.getElementById('cfServicePrice').textContent = `$${state.currentService.price * parseInt(gCount)}`;
+  
+  setProgress(3);
+  goTo('screen-confirm');
+}
+
+function confirmBooking() {
+  const loggedIn = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const booking = {
+    id: 'BMS-' + Math.random().toString(36).substr(2,8).toUpperCase(),
+    salon: state.currentSalon.name,
+    salonId: state.currentSalon.id,
+    salonEmoji: state.currentSalon.emoji,
+    service: state.currentService.name,
+    price: state.currentService.price,
+    date: state.selectedDate || 'Today',
+    time: state.selectedTime,
+    customer: document.getElementById('custName').value,
+    phone: document.getElementById('custPhone').value,
+    customerEmail: loggedIn ? loggedIn.email : '',
+    status: 'confirmed',
+    createdAt: new Date().toISOString(),
+  };
+  state.bookings.push(booking);
+  localStorage.setItem('bms_bookings', JSON.stringify(state.bookings));
+  
+  document.getElementById('sucSalon').textContent = booking.salon;
+  document.getElementById('sucService').textContent = booking.service;
+  document.getElementById('sucDateTime').textContent = `${booking.date}, ${booking.time}`;
+  document.getElementById('sucBookingId').textContent = booking.id;
+  
+  goTo('screen-success');
+  showToast('🎉 Booking confirmed!', 'success');
+}
+
+// ============================================================
+// MY BOOKINGS
+// ============================================================
+// ============================================================
+// MY BOOKINGS — tab rendering, cancel, reschedule
+// ============================================================
+
+function renderMyBookings() {
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+
+  document.getElementById('mb-guest').classList.toggle('hidden', !!user);
+  document.getElementById('mb-content').classList.toggle('hidden', !user);
+
+  // user chip in header
+  const chip = document.getElementById('mb-user-chip');
+  if (user) {
+    chip.innerHTML = `<span class="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-white text-sm font-medium">
+      <span class="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">${(user.name||'?')[0].toUpperCase()}</span>
+      ${user.name}
+    </span>`;
+  } else {
+    chip.innerHTML = '';
+    return;
+  }
+
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const mine = allBookings.filter(b => !b.customerEmail || b.customerEmail === user.email);
+  const now = new Date();
+
+  function bookingDate(b) {
+    const d = new Date(b.date);
+    return isNaN(d) ? now : d;            // fallback: treat as today
+  }
+
+  const upcoming   = mine.filter(b => b.status !== 'cancelled' && bookingDate(b) >= new Date(now.toDateString()));
+  const past       = mine.filter(b => b.status !== 'cancelled' && bookingDate(b) <  new Date(now.toDateString()));
+  const cancelled  = mine.filter(b => b.status === 'cancelled');
+
+  // counts
+  function setCount(id, n) {
+    const el = document.getElementById(id);
+    el.textContent = n;
+    el.className = 'mb-count' + (n ? '' : ' empty');
+  }
+  setCount('mb-cnt-upcoming',  upcoming.length);
+  setCount('mb-cnt-past',      past.length);
+  setCount('mb-cnt-cancelled', cancelled.length);
+
+  document.getElementById('mb-panel-upcoming').innerHTML  = renderMbCards(upcoming,  'upcoming');
+  document.getElementById('mb-panel-past').innerHTML      = renderMbCards(past,       'past');
+  document.getElementById('mb-panel-cancelled').innerHTML = renderMbCards(cancelled,  'cancelled');
+}
+
+function renderMbCards(list, type) {
+  if (!list.length) {
+    const msgs = {
+      upcoming:  ['📭', T('noUpcoming'), T('noUpcomingSub')],
+      past:      ['🗓️', T('noPast'), T('noPastSub')],
+      cancelled: ['🚫', T('noCancelled'), T('noCancelledSub')],
+    };
+    const [emoji, title, sub] = msgs[type];
+    return `<div class="mb-empty">
+      <div class="mb-empty-emoji">${emoji}</div>
+      <p class="font-semibold text-gray-700 mb-1">${title}</p>
+      <p class="text-sm text-gray-400 mb-5">${sub}</p>
+      ${type === 'upcoming' ? `<button onclick="navigate('#salons')" class="btn-primary px-6 py-2.5 rounded-2xl text-sm">Find a Salon →</button>` : ''}
+    </div>`;
+  }
+
+  return list.map(b => {
+    const emoji = b.salonEmoji || '💇';
+    const statusClass = { confirmed:'confirmed', rescheduled:'rescheduled', cancelled:'cancelled' }[b.status] || 'confirmed';
+    const statusLabel = { confirmed:`✅ ${T('statusConfirmed')}`, rescheduled:`📅 ${T('statusRescheduled')}`, cancelled:`❌ ${T('statusCancelled')}` }[b.status] || b.status;
+
+    let actions = '';
+    if (type === 'upcoming') {
+      actions = `
+        <div id="mb-actions-${b.id}" class="flex gap-2 mt-4">
+          <button onclick="openReschedule('${b.id}')"
+            class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-2xl text-xs font-semibold hover:border-pink-300 hover:text-pink-500 transition-all">
+            📅 ${T('reschedule')}
+          </button>
+          <button onclick="showCancelConfirm('${b.id}')"
+            class="flex-1 border border-red-200 text-red-500 py-2.5 rounded-2xl text-xs font-semibold hover:bg-red-50 transition-all">
+            ✕ ${T('cancel')}
+          </button>
+        </div>
+        <div id="mb-cancel-${b.id}" class="mb-cancel-box hidden">
+          <p class="text-sm font-semibold text-orange-700 mb-1">${T('cancelConfirmQ')}</p>
+          <p class="text-xs text-orange-600 mb-3" id="mb-cancel-note-${b.id}"></p>
+          <div class="flex gap-2">
+            <button onclick="confirmCancelBooking('${b.id}')"
+              class="flex-1 bg-red-500 text-white py-2 rounded-xl text-xs font-bold hover:bg-red-600 transition-all">
+              ${T('yesCancel')}
+            </button>
+            <button onclick="hideCancelConfirm('${b.id}')"
+              class="flex-1 border border-gray-200 text-gray-600 py-2 rounded-xl text-xs font-semibold hover:bg-gray-50 transition-all">
+              ${T('keepIt')}
+            </button>
+          </div>
+        </div>`;
+    } else if (type === 'past') {
+      const sId = b.salonId || null;
+      actions = `<div class="mt-4">
+        <button onclick="openReviewForBooking(${sId},'${b.salon}')"
+          class="w-full border border-yellow-300 text-yellow-600 py-2.5 rounded-2xl text-xs font-semibold hover:bg-yellow-50 transition-all">
+          ⭐ ${T('leaveReview')}
+        </button>
+      </div>`;
+    }
+
+    return `<div class="card p-5 fade-in" data-booking-id="${b.id}">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="salon-avatar" style="width:44px;height:44px;font-size:20px;">${emoji}</div>
+          <div>
+            <h4 class="font-bold text-gray-800 text-base leading-tight">${b.salon}</h4>
+            <p class="text-gray-500 text-sm">${b.service}</p>
+          </div>
+        </div>
+        <span class="mb-status ${statusClass}">${statusLabel}</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-sm text-gray-500 mb-2">
+        <span>📅 ${b.date}</span>
+        <span>⏰ ${b.time}</span>
+        <span>💰 $${b.price}</span>
+        <span class="font-mono text-pink-400 text-xs">${b.id}</span>
+      </div>
+      ${actions}
+    </div>`;
+  }).join('');
+}
+
+function switchMbTab(tab) {
+  ['upcoming','past','cancelled'].forEach(t => {
+    document.getElementById(`mb-tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`mb-panel-${t}`).classList.toggle('active', t === tab);
+  });
+}
+
+function showCancelConfirm(bookingId) {
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const b = allBookings.find(x => x.id === bookingId);
+  const noteEl = document.getElementById(`mb-cancel-note-${bookingId}`);
+  if (b && noteEl) {
+    const apptMs = new Date(`${b.date} ${b.time}`).getTime();
+    const within2h = !isNaN(apptMs) && (apptMs - Date.now()) < 2 * 60 * 60 * 1000;
+    noteEl.textContent = within2h
+      ? `⚠️ ${T('depositForfeit')}`
+      : T('noCancelCharge');
+  }
+  document.getElementById(`mb-actions-${bookingId}`).classList.add('hidden');
+  document.getElementById(`mb-cancel-${bookingId}`).classList.remove('hidden');
+}
+
+function hideCancelConfirm(bookingId) {
+  document.getElementById(`mb-cancel-${bookingId}`).classList.add('hidden');
+  document.getElementById(`mb-actions-${bookingId}`).classList.remove('hidden');
+}
+
+function confirmCancelBooking(bookingId) {
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const b = allBookings.find(x => x.id === bookingId);
+  if (b) b.status = 'cancelled';
+  localStorage.setItem('bms_bookings', JSON.stringify(allBookings));
+  state.bookings = allBookings;
+  renderMyBookings();
+  showToast('❌ Booking cancelled', 'error');
+}
+
+// Keep old cancelBooking signature in case it's still called from elsewhere
+function cancelBooking(i) {
+  const bookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  if (bookings[i]) { bookings[i].status = 'cancelled'; }
+  localStorage.setItem('bms_bookings', JSON.stringify(bookings));
+  state.bookings = bookings;
+  renderMyBookings();
+  showToast('❌ Booking cancelled', 'error');
+}
+
+function openReschedule(bookingId) {
+  // Accept either a booking ID string or a legacy index number
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  let b, idx;
+  if (typeof bookingId === 'string' && bookingId.startsWith('BMS-')) {
+    idx = allBookings.findIndex(x => x.id === bookingId);
+    b = allBookings[idx];
+  } else {
+    idx = bookingId;
+    b = allBookings[idx];
+  }
+  if (!b) return;
+  state.rescheduleId = idx;
+  document.getElementById('rescheduleInfo').textContent = `${b.salon} – ${b.service}`;
+  const today = new Date();
+  document.getElementById('rescheduleDate').value = today.toISOString().split('T')[0];
+  document.getElementById('rescheduleModal').classList.remove('hidden');
+}
+
+function confirmReschedule() {
+  const bookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const newDate = document.getElementById('rescheduleDate').value;
+  const newTime = document.getElementById('rescheduleTime').value;
+  if (!newDate) { showToast('⚠️ Please pick a date', 'error'); return; }
+  bookings[state.rescheduleId].date = newDate;
+  bookings[state.rescheduleId].time = newTime;
+  bookings[state.rescheduleId].status = 'rescheduled';
+  localStorage.setItem('bms_bookings', JSON.stringify(bookings));
+  state.bookings = bookings;
+  closeModal('rescheduleModal');
+  renderMyBookings();
+  showToast('📅 Booking rescheduled!', 'success');
+}
+
+function openReviewForBooking(salonId, salonName) {
+  const salon = SALONS.find(s => s.id === salonId) || { id: salonId, name: salonName };
+  state.currentSalon = salon;
+  document.getElementById('reviewSalonName').textContent = salonName;
+  document.getElementById('reviewModal').classList.remove('hidden');
+}
+
+// ============================================================
+// REVIEWS
+// ============================================================
+function openReviewModal() {
+  document.getElementById('reviewModal').classList.remove('hidden');
+}
+function setReviewStar(n) {
+  state.reviewStar = n;
+  document.querySelectorAll('.review-star').forEach((s,i) => s.classList.toggle('active', i < n));
+}
+function submitReview() {
+  const text = document.getElementById('reviewText').value.trim();
+  if (!text) { showToast('⚠️ Please write a review', 'error'); return; }
+  const review = { name: document.getElementById('custName')?.value || 'Anonymous', rating: state.reviewStar, text, date: 'Apr 2025' };
+  const key = `bms_reviews_${state.currentSalon.id}`;
+  const existing = JSON.parse(localStorage.getItem(key) || '[]');
+  existing.push(review);
+  localStorage.setItem(key, JSON.stringify(existing));
+  closeModal('reviewModal');
+  openSalon(state.currentSalon.id);
+  showToast('⭐ Review submitted!', 'success');
+}
+
+// ============================================================
+// OWNER DASHBOARD
+// ============================================================
+const OD_TIMES = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM'];
+
+function timeToMin(t) {
+  if (!t) return 0;
+  const parts = t.trim().split(' ');
+  const ampm = parts[1] || '';
+  const [hStr, mStr] = parts[0].split(':');
+  let h = parseInt(hStr) || 0, m = parseInt(mStr) || 0;
+  if (ampm === 'PM' && h !== 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return h * 60 + m;
+}
+
+function openSidebar() {
+  document.querySelector('.od-sidebar').classList.add('open');
+  document.getElementById('od-sidebar-overlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.querySelector('.od-sidebar').classList.remove('open');
+  document.getElementById('od-sidebar-overlay').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+function ownerTab(tab, ev) {
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.querySelectorAll('[id^="ownerTab-"]').forEach(t => t.classList.add('hidden'));
+  const panel = document.getElementById(`ownerTab-${tab}`);
+  if (panel) panel.classList.remove('hidden');
+  if (ev && ev.currentTarget) ev.currentTarget.classList.add('active');
+  closeSidebar();
+  if (tab === 'services') renderServicesTab('All');
+  if (tab === 'staff')    renderStaffTab();
+}
+
+function renderOwnerDashboard() {
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const denied = document.getElementById('od-denied');
+  const main   = document.getElementById('od-main');
+  if (!user || user.role !== 'owner') {
+    denied.classList.remove('hidden');
+    main.classList.add('hidden');
+    return;
+  }
+  denied.classList.add('hidden');
+  main.classList.remove('hidden');
+
+  const salonId  = user.salonId || 1;
+  const salon    = SALONS.find(s => s.id === salonId) || SALONS[0];
+  const settings = JSON.parse(localStorage.getItem('bms_salon_settings') || 'null') || {
+    name: salon.name, address: salon.address,
+    open: '09:00', close: '19:00',
+    deposit: 20, cancelWindow: 2, walkin: salon.walkin, depositEnabled: true,
+  };
+  const allBookings  = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const salonBookings = allBookings.filter(b => b.salonId === salonId);
+
+  const salonDisplayName = settings.name || salon.name;
+  document.getElementById('od-salon-name').textContent = salonDisplayName;
+
+  const now = new Date();
+  document.getElementById('od-today-label').innerHTML =
+    '📅 Today, ' + now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+  const wStart = new Date(now); wStart.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+  const wEnd   = new Date(wStart); wEnd.setDate(wStart.getDate() + 6);
+  document.getElementById('od-week-label').textContent =
+    `${wStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${wEnd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+
+  document.getElementById('set-salon-name').value      = settings.name || salon.name;
+  document.getElementById('set-address').value         = settings.address || salon.address;
+  document.getElementById('set-open').value            = settings.open || '09:00';
+  document.getElementById('set-close').value           = settings.close || '19:00';
+  document.getElementById('set-deposit').value         = settings.deposit ?? 20;
+  document.getElementById('set-cancel-window').value   = settings.cancelWindow ?? 2;
+  document.getElementById('set-walkin').checked        = !!settings.walkin;
+  document.getElementById('set-deposit-enabled').checked = settings.depositEnabled !== false;
+  document.getElementById('walkinToggle').checked      = !!settings.walkin;
+
+  renderOwnerOverview(salonBookings, salon, settings);
+  renderOwnerScheduleView(salonBookings, salonId);
+  renderOwnerBookings(salonBookings);
+  renderOwnerNoShows(salonBookings, settings);
+}
+
+const OD_AVATAR_COLORS = ['#FF6B9A','#22C55E','#8B5CF6','#3B82F6','#F59E0B','#EF4444','#06B6D4','#F97316','#EC4899','#14B8A6'];
+function odAvatarColor(name) {
+  let h = 0;
+  for (const c of (name || '?')) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return OD_AVATAR_COLORS[h % OD_AVATAR_COLORS.length];
+}
+
+function renderMiniCalendar(salonBookings) {
+  const now   = new Date();
+  const year  = now.getFullYear();
+  const month = now.getMonth();
+  const today = now.getDate();
+  const calTitle = document.getElementById('od-cal-title');
+  if (calTitle) calTitle.textContent = now.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  const firstDay    = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const bookedDays  = new Set(
+    salonBookings
+      .filter(b => { const d = new Date(b.date); return d.getFullYear() === year && d.getMonth() === month && b.status !== 'cancelled'; })
+      .map(b => new Date(b.date).getDate())
+  );
+  const dayNames = ['S','M','T','W','T','F','S'];
+  let html = '<div class="od-cal-grid">';
+  dayNames.forEach(d => html += `<div class="od-cal-hd">${d}</div>`);
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    let cls = 'od-cal-cell';
+    if (d === today) cls += ' od-cal-today';
+    else if (bookedDays.has(d)) cls += ' od-cal-booked';
+    html += `<div class="${cls}">${d}</div>`;
+  }
+  html += '</div>';
+  const calEl = document.getElementById('od-mini-calendar');
+  if (calEl) calEl.innerHTML = html;
+}
+
+function renderOwnerOverview(salonBookings, salon, settings) {
+  const nowD     = new Date(); nowD.setHours(0,0,0,0);
+  const today    = new Date().toDateString();
+  const mStart   = new Date(nowD.getFullYear(), nowD.getMonth(), 1);
+  const mEnd     = new Date(nowD.getFullYear(), nowD.getMonth() + 1, 0);
+  const lmStart  = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1);
+  const lmEnd    = new Date(nowD.getFullYear(), nowD.getMonth(), 0);
+  const inRange  = (d, s, e) => d >= s && d <= e;
+
+  const todayBk  = salonBookings.filter(b => b.date === today && b.status !== 'cancelled');
+  const todayRev = todayBk.reduce((s, b) => s + (parseFloat(b.price) || 0), 0);
+  const pending  = salonBookings.filter(b => b.status === 'pending').length;
+  const monthBk  = salonBookings.filter(b => { const d = new Date(b.date); return inRange(d, mStart, mEnd) && b.status !== 'cancelled'; });
+  const monthRev = monthBk.reduce((s, b) => s + (parseFloat(b.price) || 0), 0);
+  const lmBk     = salonBookings.filter(b => { const d = new Date(b.date); return inRange(d, lmStart, lmEnd) && b.status !== 'cancelled'; });
+  const lmRev    = lmBk.reduce((s, b) => s + (parseFloat(b.price) || 0), 0);
+
+  const thisMonthCustomers = [...new Set(monthBk.map(b => b.customer))];
+  const newCusts = thisMonthCustomers.filter(name =>
+    !salonBookings.some(b => new Date(b.date) < mStart && b.customer === name && b.status !== 'cancelled')
+  ).length;
+
+  document.getElementById('od-stat-bookings').textContent = todayBk.length;
+  document.getElementById('od-stat-revenue').textContent  = '$' + todayRev.toFixed(0);
+  document.getElementById('od-stat-noshows').textContent  = pending;
+  document.getElementById('od-stat-rating').textContent   = newCusts;
+
+  const list = document.getElementById('od-today-list');
+  if (todayBk.length === 0) {
+    list.innerHTML = '<div class="text-center py-8 text-gray-400"><div class="text-3xl mb-2">📭</div><p class="text-sm">No appointments today</p></div>';
+  } else {
+    list.innerHTML = [...todayBk]
+      .sort((a, b) => timeToMin(a.time) - timeToMin(b.time))
+      .map(b => {
+        const initials = (b.customer || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+        const color    = odAvatarColor(b.customer);
+        const statusCls = b.status === 'confirmed' ? 'od-appt-status-confirmed'
+          : b.status === 'pending'  ? 'od-appt-status-pending'
+          : b.status === 'no-show' ? 'od-appt-status-noshow'
+          : 'od-appt-status-default';
+        const label = b.status === 'no-show' ? 'NO-SHOW' : b.status.toUpperCase();
+        return `
+          <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:${color}">${initials}</div>
+            <div class="flex-1 min-w-0">
+              <p class="font-semibold text-sm text-gray-800">${b.customer}</p>
+              <p class="text-gray-400 text-xs truncate">${b.service}${b.price ? ' · $' + parseFloat(b.price).toFixed(0) : ''}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="text-sm font-semibold text-gray-700">${b.time}</span>
+              <span class="${statusCls}">${label}</span>
+            </div>
+          </div>`;
+      }).join('');
+  }
+
+  // Revenue trend
+  let revPct = '—';
+  if (lmRev > 0) {
+    const p = Math.round((monthRev - lmRev) / lmRev * 100);
+    revPct = (p >= 0 ? '+' : '') + p + '%';
+  } else if (monthRev > 0) {
+    revPct = '+100%';
+  }
+  const revEl = document.getElementById('od-revenue-pct');
+  if (revEl) revEl.textContent = revPct;
+
+  // Recovery insights
+  const nsCount = salonBookings.filter(b => { const d = new Date(b.date); return inRange(d, mStart, mEnd) && b.status === 'no-show'; }).length;
+  const nsBadge = document.getElementById('od-ns-pct');
+  if (nsBadge) nsBadge.textContent = nsCount === 0 ? '0 No-Shows' : '-' + nsCount + ' No-Shows';
+  const barPct = monthBk.length > 0 ? Math.min(100, Math.round((monthBk.length - nsCount) / monthBk.length * 100)) : 0;
+  const bar = document.getElementById('od-recovery-bar');
+  if (bar) bar.style.width = barPct + '%';
+  const recovRev = document.getElementById('od-recovery-rev');
+  if (recovRev) recovRev.textContent = '$' + monthRev.toFixed(0);
+
+  renderMiniCalendar(salonBookings);
+}
+
+// ============================================================
+// SERVICES TAB
+// ============================================================
+let DEMO_SERVICES = [
+  { id:1, name:'Haircut & Style',    cat:'Hair',   price:35,  dur:45,  bookings:142, trending:true  },
+  { id:2, name:'Hair Coloring',      cat:'Hair',   price:85,  dur:90,  bookings:98,  trending:true  },
+  { id:3, name:'Facial Treatment',   cat:'Skin',   price:50,  dur:60,  bookings:76,  trending:false },
+  { id:4, name:'Manicure & Pedicure',cat:'Nails',  price:40,  dur:45,  bookings:115, trending:true  },
+  { id:5, name:'Massage Therapy',    cat:'Body',   price:65,  dur:60,  bookings:89,  trending:false },
+  { id:6, name:'Keratin Treatment',  cat:'Hair',   price:150, dur:120, bookings:34,  trending:false },
+  { id:7, name:'Lash Extensions',    cat:'Beauty', price:120, dur:90,  bookings:67,  trending:true  },
+  { id:8, name:'Brow Lamination',    cat:'Beauty', price:55,  dur:30,  bookings:52,  trending:false },
+];
+
+const SCISSORS_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF6B9A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="20.49" y1="3.51" x2="3.51" y2="20.49"/><path d="M2.96 12.96l3.54-3.54M20.49 3.51l-3.54 3.54"/></svg>`;
+const TRENDING_BADGE = `<span class="svc-trending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Trending</span>`;
+
+function renderServicesTab(cat) {
+  cat = cat || 'All';
+  const grid = document.getElementById('svc-grid');
+  if (!grid) return;
+  const list = cat === 'All' ? DEMO_SERVICES : DEMO_SERVICES.filter(s => s.cat === cat);
+  grid.innerHTML = list.map(s => `
+    <div class="card p-5">
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="svc-card-icon">${SCISSORS_SVG}</div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-bold text-gray-800 text-sm">${s.name}</span>
+              ${s.trending ? TRENDING_BADGE : ''}
+            </div>
+            <div class="text-xs text-gray-400 mt-0.5">${s.cat}</div>
+          </div>
+        </div>
+        <div class="flex gap-1 flex-shrink-0">
+          <button class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-100">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors border border-gray-100">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center justify-between text-sm">
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1.5 font-bold text-gray-800">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            $${s.price}
+          </span>
+          <span class="flex items-center gap-1.5 text-gray-400">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${s.dur} min
+          </span>
+        </div>
+        <span class="text-xs text-gray-400">${s.bookings} bookings</span>
+      </div>
+    </div>`).join('');
+}
+
+function filterServices(cat, btn) {
+  document.querySelectorAll('.svc-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderServicesTab(cat);
+}
+
+// ============================================================
+// STAFF TAB
+// ============================================================
+let DEMO_STAFF = [
+  { id:1, name:'Sarah Miller', role:'Senior Stylist',   skills:['Haircut','Coloring'],              rating:4.9, today:6, status:'available' },
+  { id:2, name:'James Lee',    role:'Barber',           skills:["Men's Cut",'Beard Trim'],           rating:4.8, today:5, status:'busy'      },
+  { id:3, name:'Maria Garcia', role:'Nail Technician',  skills:['Manicure','Pedicure','Nail Art'],   rating:4.7, today:7, status:'available' },
+  { id:4, name:'Aisha Patel',  role:'Esthetician',      skills:['Facial','Waxing','Skincare'],       rating:4.9, today:4, status:'off'       },
+  { id:5, name:'Tom Rivera',   role:'Massage Therapist',skills:['Deep Tissue','Swedish','Hot Stone'],rating:5.0, today:3, status:'busy'      },
+];
+
+function renderStaffTab() {
+  const list = document.getElementById('staff-list');
+  if (!list) return;
+  const available = DEMO_STAFF.filter(s => s.status === 'available').length;
+  const avgRating = (DEMO_STAFF.reduce((a, s) => a + s.rating, 0) / DEMO_STAFF.length).toFixed(1);
+  const totalEl = document.getElementById('staff-total');
+  const availEl = document.getElementById('staff-available');
+  const rateEl  = document.getElementById('staff-rating');
+  if (totalEl) totalEl.textContent = DEMO_STAFF.length;
+  if (availEl) availEl.textContent = available;
+  if (rateEl)  rateEl.textContent  = avgRating;
+
+  list.innerHTML = DEMO_STAFF.map(s => {
+    const initials  = s.name.split(' ').map(w => w[0]).join('').toUpperCase();
+    const color     = odAvatarColor(s.name);
+    const dotColor  = s.status === 'available' ? '#22C55E' : s.status === 'busy' ? '#F59E0B' : '#9CA3AF';
+    const statusCls = s.status === 'available' ? 'staff-status-available' : s.status === 'busy' ? 'staff-status-busy' : 'staff-status-off';
+    const statusLbl = s.status === 'available' ? T('statusAvailable') : s.status === 'busy' ? T('statusBusy') : T('statusOff');
+    const skillsHtml = s.skills.map(sk => `<span class="staff-skill-tag">${sk}</span>`).join('<span style="color:#E5E7EB;margin:0 2px;">·</span>');
+    return `
+      <div class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
+        <div class="relative flex-shrink-0">
+          <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background:${color}">${initials}</div>
+          <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white" style="background:${dotColor}"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-gray-800 text-sm">${s.name}</p>
+          <p class="text-gray-400 text-xs mb-1">${s.role}</p>
+          <div class="flex flex-wrap items-center gap-0.5">${skillsHtml}</div>
+        </div>
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <div class="text-right">
+            <div class="flex items-center gap-1 justify-end mb-0.5">
+              <span class="text-yellow-400 text-sm">★</span>
+              <span class="text-sm font-bold text-gray-800">${s.rating.toFixed(1)}</span>
+            </div>
+            <div class="flex items-center gap-1 text-xs text-gray-400 justify-end">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              ${s.today} today
+            </div>
+          </div>
+          <span class="${statusCls}">${statusLbl}</span>
+          <button class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors" style="font-size:18px;letter-spacing:-1px;">···</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================================
+// ADD SERVICE / ADD STAFF MODALS
+// ============================================================
+function openAddServiceModal() {
+  document.getElementById('newSvcName').value = '';
+  document.getElementById('newSvcCat').value = 'Hair';
+  document.getElementById('newSvcPrice').value = '';
+  document.getElementById('newSvcDur').value = '';
+  document.getElementById('addServiceModal').classList.remove('hidden');
+}
+
+function submitAddService() {
+  const name  = document.getElementById('newSvcName').value.trim();
+  const cat   = document.getElementById('newSvcCat').value;
+  const price = parseInt(document.getElementById('newSvcPrice').value, 10);
+  const dur   = parseInt(document.getElementById('newSvcDur').value, 10);
+  if (!name) { alert('Please enter a service name.'); return; }
+  if (!price || price < 1) { alert('Please enter a valid price.'); return; }
+  if (!dur || dur < 5) { alert('Please enter a valid duration.'); return; }
+  DEMO_SERVICES.push({ id: DEMO_SERVICES.length + 1, name, cat, price, dur, bookings: 0, trending: false });
+  closeModal('addServiceModal');
+  renderServicesTab('All');
+  document.querySelectorAll('.svc-filter-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+}
+
+function openAddStaffModal() {
+  document.getElementById('newStaffName').value = '';
+  document.getElementById('newStaffRole').value = '';
+  document.getElementById('newStaffSkills').value = '';
+  document.getElementById('newStaffStatus').value = 'available';
+  document.getElementById('addStaffModal').classList.remove('hidden');
+}
+
+function submitAddStaff() {
+  const name   = document.getElementById('newStaffName').value.trim();
+  const role   = document.getElementById('newStaffRole').value.trim();
+  const skills = document.getElementById('newStaffSkills').value.split(',').map(s => s.trim()).filter(Boolean);
+  const status = document.getElementById('newStaffStatus').value;
+  if (!name) { alert('Please enter a staff name.'); return; }
+  if (!role) { alert('Please enter a role/title.'); return; }
+  if (!skills.length) { alert('Please enter at least one skill.'); return; }
+  DEMO_STAFF.push({ id: DEMO_STAFF.length + 1, name, role, skills, rating: 0, today: 0, status });
+  closeModal('addStaffModal');
+  renderStaffTab();
+}
+
+function renderOwnerScheduleView(salonBookings, salonId) {
+  const grid    = document.getElementById('od-week-grid');
+  const now     = new Date();
+  const dow     = now.getDay();
+  const monday  = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  monday.setHours(0,0,0,0);
+
+  const weekDays = Array.from({length:5}, (_, i) => {
+    const d = new Date(monday); d.setDate(monday.getDate() + i); return d;
+  });
+  const blocked  = JSON.parse(localStorage.getItem('bms_blocked') || '[]').filter(b => b.salonId === salonId);
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri'];
+  const todayStr = now.toDateString();
+
+  let html = '<table class="w-full border-collapse" style="min-width:560px;"><thead><tr>';
+  html += '<th style="width:72px;"></th>';
+  weekDays.forEach((d, i) => {
+    const isToday = d.toDateString() === todayStr;
+    html += `<th class="text-center px-1 py-2 text-xs font-semibold text-gray-500 border-b border-gray-100">
+      <div class="flex flex-col items-center gap-0.5">
+        <span class="text-xs text-gray-400 uppercase tracking-wide">${dayNames[i]}</span>
+        <span class="${isToday ? 'od-day-today' : 'text-sm font-bold text-gray-700'}">${d.getDate()}</span>
+      </div>
+    </th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  OD_TIMES.forEach(time => {
+    html += `<tr><td class="pr-2 py-0.5 text-xs text-gray-400 text-right font-medium whitespace-nowrap align-middle" style="width:72px;">${time}</td>`;
+    weekDays.forEach(d => {
+      const dateStr = d.toDateString();
+      const booking = salonBookings.find(b => b.date === dateStr && b.time === time && b.status !== 'cancelled' && b.status !== 'no-show');
+      const isBlocked = blocked.some(b => b.date === dateStr && b.time === time);
+      if (booking) {
+        html += `<td class="px-1 py-0.5"><div class="od-slot-booked"><span>${booking.customer}</span><span style="font-weight:400;font-size:10px;opacity:0.85;">${booking.service}</span></div></td>`;
+      } else if (isBlocked) {
+        html += `<td class="px-1 py-0.5"><div class="od-slot-blocked" onclick="unblockOwnerSlot('${dateStr}','${time}')">Blocked</div></td>`;
+      } else {
+        html += `<td class="px-1 py-0.5"><div class="od-slot-free" onclick="blockOwnerSlot('${dateStr}','${time}')"></div></td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  grid.innerHTML = html;
+}
+
+function blockOwnerSlot(dateStr, time) {
+  const user    = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId = user ? (user.salonId || 1) : 1;
+  const blocked = JSON.parse(localStorage.getItem('bms_blocked') || '[]');
+  if (!blocked.some(b => b.salonId === salonId && b.date === dateStr && b.time === time)) {
+    blocked.push({ salonId, date: dateStr, time });
+    localStorage.setItem('bms_blocked', JSON.stringify(blocked));
+  }
+  const salonBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]').filter(b => b.salonId === salonId);
+  renderOwnerScheduleView(salonBookings, salonId);
+  showToast(`⛔ ${time} blocked`, 'error');
+}
+
+function unblockOwnerSlot(dateStr, time) {
+  const user    = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId = user ? (user.salonId || 1) : 1;
+  const blocked = JSON.parse(localStorage.getItem('bms_blocked') || '[]')
+    .filter(b => !(b.salonId === salonId && b.date === dateStr && b.time === time));
+  localStorage.setItem('bms_blocked', JSON.stringify(blocked));
+  const salonBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]').filter(b => b.salonId === salonId);
+  renderOwnerScheduleView(salonBookings, salonId);
+  showToast(`✅ ${time} unblocked`, 'success');
+}
+
+function renderOwnerBookings(bookingsArg) {
+  const user    = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId = user ? (user.salonId || 1) : 1;
+  if (bookingsArg !== undefined) {
+    state._ownerBookings = bookingsArg;
+  } else if (!state._ownerBookings) {
+    state._ownerBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]').filter(b => b.salonId === salonId);
+  }
+
+  const q      = (document.getElementById('od-bk-search')?.value || '').toLowerCase();
+  const filter = document.getElementById('od-bk-filter')?.value || 'all';
+  let rows     = state._ownerBookings;
+  if (q)            rows = rows.filter(b => (b.customer || '').toLowerCase().includes(q));
+  if (filter !== 'all') rows = rows.filter(b => b.status === filter);
+  rows = [...rows].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+  const tbody = document.getElementById('od-bk-tbody');
+  const empty = document.getElementById('od-bk-empty');
+  if (rows.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+
+  const sc = { confirmed:'bg-green-100 text-green-700', rescheduled:'bg-blue-100 text-blue-700',
+               pending:'bg-yellow-100 text-yellow-700', 'no-show':'bg-red-100 text-red-600', cancelled:'bg-gray-100 text-gray-500' };
+  tbody.innerHTML = rows.map(b => {
+    const cls      = sc[b.status] || 'bg-gray-100 text-gray-500';
+    const canNoShow = b.status === 'confirmed' || b.status === 'rescheduled';
+    return `<tr>
+      <td><div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-white text-xs font-bold flex-shrink-0">${(b.customer||'?')[0]}</div>
+        <div><p class="font-medium text-sm text-gray-800">${b.customer||'—'}</p><p class="text-xs text-gray-400">${b.phone||'—'}</p></div>
+      </div></td>
+      <td><span class="text-sm text-gray-700">${b.service||'—'}</span><br><span class="text-xs text-gray-400">$${b.price||0}</span></td>
+      <td><span class="text-sm font-medium text-gray-800">${b.date||'—'}</span><br><span class="text-xs text-gray-400">${b.time||'—'}</span></td>
+      <td><span class="text-xs px-2.5 py-1 rounded-full font-semibold ${cls}">${b.status}</span>${b.depositForfeited ? '<br><span class="badge-deposit text-xs mt-0.5 inline-block">deposit forfeited</span>' : ''}</td>
+      <td>${canNoShow ? `<button onclick="markNoShow('${b.id}')" class="text-xs text-red-500 border border-red-200 rounded-lg px-2.5 py-1.5 hover:bg-red-50 font-medium transition-colors whitespace-nowrap">Mark No-Show</button>` : '<span class="text-xs text-gray-300">—</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function markNoShow(bookingId) {
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const idx = allBookings.findIndex(b => b.id === bookingId);
+  if (idx === -1) return;
+  allBookings[idx].status = 'no-show';
+  allBookings[idx].depositForfeited = true;
+  localStorage.setItem('bms_bookings', JSON.stringify(allBookings));
+  const user        = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId     = user ? (user.salonId || 1) : 1;
+  const salonBookings = allBookings.filter(b => b.salonId === salonId);
+  state._ownerBookings = salonBookings;
+  const salon       = SALONS.find(s => s.id === salonId) || SALONS[0];
+  const settings    = JSON.parse(localStorage.getItem('bms_salon_settings') || 'null') || { deposit: 20 };
+  renderOwnerBookings();
+  renderOwnerNoShows(salonBookings, settings);
+  showToast('🚨 Marked as no-show, deposit forfeited', 'error');
+}
+
+function renderOwnerNoShows(salonBookings, settings) {
+  const deposit  = settings ? (settings.deposit || 20) : 20;
+  const noShows  = salonBookings.filter(b => b.status === 'no-show');
+  const total    = noShows.filter(b => b.depositForfeited).length * deposit;
+  document.getElementById('od-ns-total').textContent = `$${total}`;
+  const list = document.getElementById('od-ns-list');
+  if (noShows.length === 0) {
+    list.innerHTML = '<div class="text-center py-8 text-gray-400"><div class="text-3xl mb-2">✅</div><p class="text-sm">No no-shows recorded — great!</p></div>';
+    return;
+  }
+  list.innerHTML = noShows.map(b => `
+    <div class="flex items-center justify-between p-3 bg-red-50 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-400 text-xs font-bold">${(b.customer||'?')[0]}</div>
+        <div><p class="font-medium text-sm text-gray-800">${b.customer||'—'}</p><p class="text-gray-400 text-xs">${b.service} · ${b.date}</p></div>
+      </div>
+      <div class="text-right">
+        ${b.depositForfeited ? `<span class="badge-deposit">$${deposit} forfeited</span>` : ''}
+        <p class="text-gray-400 text-xs mt-1">${b.phone||'—'}</p>
+      </div>
+    </div>`).join('');
+}
+
+function saveOwnerSettings() {
+  const settings = {
+    name:           document.getElementById('set-salon-name').value.trim(),
+    address:        document.getElementById('set-address').value.trim(),
+    open:           document.getElementById('set-open').value,
+    close:          document.getElementById('set-close').value,
+    deposit:        parseFloat(document.getElementById('set-deposit').value) || 20,
+    cancelWindow:   parseInt(document.getElementById('set-cancel-window').value) || 2,
+    walkin:         document.getElementById('set-walkin').checked,
+    depositEnabled: document.getElementById('set-deposit-enabled').checked,
+  };
+  localStorage.setItem('bms_salon_settings', JSON.stringify(settings));
+  document.getElementById('od-salon-name').textContent = settings.name;
+  const wt = document.getElementById('walkinToggle'); if (wt) wt.checked = settings.walkin;
+  showToast('💾 Settings saved!', 'success');
+}
+
+function toggleWalkin() {
+  const val = document.getElementById('walkinToggle').checked;
+  state.walkin = val;
+  if (state.currentSalon) state.currentSalon.walkin = val;
+  const sw = document.getElementById('set-walkin');
+  if (sw) sw.checked = val;
+  showToast(val ? '🚶 Walk-in mode enabled' : '🚫 Walk-in mode disabled', 'success');
+}
+
+// ============================================================
+// BLOCK TIME MODAL
+// ============================================================
+function openBlockModal() {
+  document.getElementById('blockModal').classList.remove('hidden');
+}
+function confirmBlock() {
+  const user    = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId = user ? (user.salonId || 1) : 1;
+  const start   = document.getElementById('blockStart').value;
+  const end     = document.getElementById('blockEnd').value;
+  const today   = new Date().toDateString();
+  const startMin = timeToMin(start), endMin = timeToMin(end);
+  const blocked  = JSON.parse(localStorage.getItem('bms_blocked') || '[]');
+  OD_TIMES.forEach(t => {
+    const m = timeToMin(t);
+    if (m >= startMin && m < endMin && !blocked.some(b => b.salonId === salonId && b.date === today && b.time === t)) {
+      blocked.push({ salonId, date: today, time: t });
+    }
+  });
+  localStorage.setItem('bms_blocked', JSON.stringify(blocked));
+  const salonBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]').filter(b => b.salonId === salonId);
+  renderOwnerScheduleView(salonBookings, salonId);
+  closeModal('blockModal');
+  showToast(`⛔ Times blocked: ${start} – ${end}`, 'success');
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function showToast(msg, type='success') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `notification ${type === 'error' ? 'error' : ''} show`;
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
