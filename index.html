@@ -1151,6 +1151,7 @@
                 <option value="confirmed">Confirmed</option>
                 <option value="rescheduled">Rescheduled</option>
                 <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
                 <option value="no-show">No-Show</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -3021,10 +3022,11 @@ function renderOwnerBookings(bookingsArg) {
   empty.classList.add('hidden');
 
   const sc = { confirmed:'bg-green-100 text-green-700', rescheduled:'bg-blue-100 text-blue-700',
-               pending:'bg-yellow-100 text-yellow-700', 'no-show':'bg-red-100 text-red-600', cancelled:'bg-gray-100 text-gray-500' };
+               pending:'bg-yellow-100 text-yellow-700', completed:'bg-purple-100 text-purple-700',
+               'no-show':'bg-red-100 text-red-600', cancelled:'bg-gray-100 text-gray-500' };
   tbody.innerHTML = rows.map(b => {
-    const cls      = sc[b.status] || 'bg-gray-100 text-gray-500';
-    const canNoShow = b.status === 'confirmed' || b.status === 'rescheduled';
+    const cls     = sc[b.status] || 'bg-gray-100 text-gray-500';
+    const canAct  = b.status === 'confirmed' || b.status === 'rescheduled' || b.status === 'pending';
     return `<tr>
       <td><div class="flex items-center gap-2">
         <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-white text-xs font-bold flex-shrink-0">${(b.customer||'?')[0]}</div>
@@ -3033,7 +3035,16 @@ function renderOwnerBookings(bookingsArg) {
       <td><span class="text-sm text-gray-700">${b.service||'—'}</span><br><span class="text-xs text-gray-400">$${b.price||0}</span></td>
       <td><span class="text-sm font-medium text-gray-800">${b.date||'—'}</span><br><span class="text-xs text-gray-400">${b.time||'—'}</span></td>
       <td><span class="text-xs px-2.5 py-1 rounded-full font-semibold ${cls}">${b.status}</span>${b.depositForfeited ? '<br><span class="badge-deposit text-xs mt-0.5 inline-block">deposit forfeited</span>' : ''}</td>
-      <td>${canNoShow ? `<button onclick="markNoShow('${b.id}')" class="text-xs text-red-500 border border-red-200 rounded-lg px-2.5 py-1.5 hover:bg-red-50 font-medium transition-colors whitespace-nowrap">Mark No-Show</button>` : '<span class="text-xs text-gray-300">—</span>'}</td>
+      <td><div class="flex items-center gap-1.5">
+        ${canAct ? `
+          <button onclick="markDone('${b.id}')" title="Mark as done"
+            style="width:30px;height:30px;border-radius:8px;background:#dcfce7;color:#16a34a;border:none;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+            onmouseover="this.style.background='#bbf7d0'" onmouseout="this.style.background='#dcfce7'">✓</button>
+          <button onclick="removeBooking('${b.id}')" title="Remove booking"
+            style="width:30px;height:30px;border-radius:8px;background:#fee2e2;color:#ef4444;border:none;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+            onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">✕</button>
+        ` : '<span class="text-xs text-gray-300">—</span>'}
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -3054,6 +3065,31 @@ function markNoShow(bookingId) {
   renderOwnerBookings();
   renderOwnerNoShows(salonBookings, settings);
   showToast('🚨 Marked as no-show, deposit forfeited', 'error');
+}
+
+function markDone(bookingId) {
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]');
+  const idx = allBookings.findIndex(b => b.id === bookingId);
+  if (idx === -1) return;
+  allBookings[idx].status = 'completed';
+  localStorage.setItem('bms_bookings', JSON.stringify(allBookings));
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId = user ? (user.salonId || 1) : 1;
+  state._ownerBookings = allBookings.filter(b => b.salonId === salonId);
+  renderOwnerBookings();
+  showToast('✅ Booking marked as completed', 'success');
+}
+
+function removeBooking(bookingId) {
+  const allBookings = JSON.parse(localStorage.getItem('bms_bookings') || '[]')
+    .filter(b => b.id !== bookingId);
+  localStorage.setItem('bms_bookings', JSON.stringify(allBookings));
+  state.bookings = allBookings;
+  const user = JSON.parse(localStorage.getItem('bms_user') || 'null');
+  const salonId = user ? (user.salonId || 1) : 1;
+  state._ownerBookings = allBookings.filter(b => b.salonId === salonId);
+  renderOwnerBookings();
+  showToast('🗑️ Booking removed', 'success');
 }
 
 function renderOwnerNoShows(salonBookings, settings) {
