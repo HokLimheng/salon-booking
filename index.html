@@ -961,7 +961,7 @@
       <aside class="od-sidebar">
         <div class="od-sidebar-header">
           <img src="bookmysalon_logo.jpg" alt="BookMySalon" style="width:34px;height:34px;border-radius:10px;object-fit:cover;flex-shrink:0;">
-          <span class="od-sidebar-logo-text" id="od-salon-name">Glamour Salon</span>
+          <span class="od-sidebar-logo-text" id="od-salon-name">Mo Studio Salon</span>
         </div>
         <nav class="od-sidebar-nav">
           <div class="sidebar-link active" onclick="ownerTab('overview',event)">
@@ -1466,7 +1466,7 @@
 // DATA
 // ============================================================
 const SALONS = [
-  { id:1, name:"Glamour Salon", emoji:"💇", rating:4.9, reviews:248, address:"271 Mao Tse Tung Blvd, Toul Kork, Phnom Penh", hours:"9:00 AM – 7:00 PM", tags:["Haircut","Coloring","Styling"], photos:["💇","✂️","💄"], walkin:false,
+  { id:1, name:"Mo Studio Salon", emoji:"💇", rating:4.9, reviews:248, address:"271 Mao Tse Tung Blvd, Toul Kork, Phnom Penh", hours:"9:00 AM – 7:00 PM", tags:["Haircut","Coloring","Styling"], photos:["💇","✂️","💄"], walkin:false,
     services:[
       {id:"s1",name:"Haircut & Style",duration:"45 min",price:35,tags:["Haircut","45 min","Casual"]},
       {id:"s2",name:"Hair Coloring",duration:"90 min",price:85,tags:["Haircut","90 min","Professional"]},
@@ -1479,7 +1479,7 @@ const SALONS = [
       {name:"Mia L.",rating:5,text:"Best haircut I've had in years. Will definitely come back!",date:"Mar 2025"},
     ]
   },
-  { id:2, name:"Bella Beauty Bar", emoji:"💅", rating:4.7, reviews:182, address:"217 St 217, Veal Vong, 7 Makara, Phnom Penh", hours:"10:00 AM – 8:00 PM", tags:["Nails","Lashes","Brows"], photos:["💅","👁️","✨"],
+  { id:2, name:"Sreyly Salon", emoji:"💅", rating:4.7, reviews:182, address:"217 St 217, Veal Vong, 7 Makara, Phnom Penh", hours:"10:00 AM – 8:00 PM", tags:["Nails","Lashes","Brows"], photos:["💅","👁️","✨"],
     services:[
       {id:"s6",name:"Gel Manicure",duration:"60 min",price:45,tags:["Nails","Gel","Premium"]},
       {id:"s7",name:"Lash Extensions",duration:"90 min",price:95,tags:["Lashes","90 min","Volume"]},
@@ -1487,7 +1487,7 @@ const SALONS = [
     ],
     reviewsList:[{name:"Emma K.",rating:4,text:"Great nail service, very clean and professional.",date:"Apr 2025"}]
   },
-  { id:3, name:"Zen Wellness Spa", emoji:"🧘", rating:4.8, reviews:316, address:"113 Norodom Blvd, BKK1, Chamkarmon, Phnom Penh", hours:"8:00 AM – 9:00 PM", tags:["Spa","Massage","Facial"], photos:["🧘","💆","🌿"],
+  { id:3, name:"HER Beauty Salon", emoji:"🧘", rating:4.8, reviews:316, address:"113 Norodom Blvd, BKK1, Chamkarmon, Phnom Penh", hours:"8:00 AM – 9:00 PM", tags:["Spa","Massage","Facial"], photos:["🧘","💆","🌿"],
     services:[
       {id:"s9",name:"Deep Tissue Massage",duration:"60 min",price:80,tags:["Massage","60 min","Therapeutic"]},
       {id:"s10",name:"Hydrating Facial",duration:"75 min",price:90,tags:["Facial","75 min","Luxury"]},
@@ -1495,21 +1495,21 @@ const SALONS = [
     ],
     reviewsList:[{name:"Lisa T.",rating:5,text:"Absolutely divine! The hot stone therapy changed my life.",date:"Apr 2025"}]
   },
-  { id:4, name:"Curls & Co.", emoji:"🌀", rating:4.6, reviews:97, address:"51 St 51, Srah Chak, Daun Penh, Phnom Penh", hours:"10:00 AM – 6:00 PM", tags:["Curly Hair","Natural Hair","Braids"], photos:["🌀","💇‍♀️","✂️"],
+  { id:4, name:"Phkar Chhouk Beauty Salon.", emoji:"🌀", rating:4.6, reviews:97, address:"51 St 51, Srah Chak, Daun Penh, Phnom Penh", hours:"10:00 AM – 6:00 PM", tags:["Curly Hair","Natural Hair","Braids"], photos:["🌀","💇‍♀️","✂️"],
     services:[
       {id:"s12",name:"Curly Cut",duration:"60 min",price:55,tags:["Curly","60 min","Specialty"]},
       {id:"s13",name:"Braid Styling",duration:"120 min",price:75,tags:["Braids","120 min","Natural"]},
     ],
     reviewsList:[{name:"Nia B.",rating:5,text:"Finally a salon that knows how to work with natural hair!",date:"Mar 2025"}]
   },
-  { id:5, name:"Glow Up Studio", emoji:"✨", rating:4.9, reviews:203, address:"159 Sisowath Quay, Wat Phnom, Daun Penh, Phnom Penh", hours:"9:00 AM – 8:00 PM", tags:["Makeup","Skincare","Waxing"], photos:["✨","💄","🌟"],
+  { id:5, name:"Vy Queen Care Salon", emoji:"✨", rating:4.9, reviews:203, address:"159 Sisowath Quay, Wat Phnom, Daun Penh, Phnom Penh", hours:"9:00 AM – 8:00 PM", tags:["Makeup","Skincare","Waxing"], photos:["✨","💄","🌟"],
     services:[
       {id:"s14",name:"Bridal Makeup",duration:"120 min",price:150,tags:["Makeup","Bridal","Luxury"]},
       {id:"s15",name:"Express Facial",duration:"30 min",price:35,tags:["Skincare","30 min","Quick"]},
     ],
     reviewsList:[{name:"Priya S.",rating:5,text:"The bridal makeup was absolutely stunning. Exceeded all expectations!",date:"Apr 2025"}]
   },
-  { id:6, name:"Luxe Hair Lounge", emoji:"👸", rating:4.8, reviews:175, address:"430 Monivong Blvd, Tonle Bassac, Chamkarmon, Phnom Penh", hours:"9:00 AM – 7:00 PM", tags:["Blowout","Extensions","Keratin"], photos:["👸","💁","💎"],
+  { id:6, name:"Kesor (កេសរ) - Floral Beauty", emoji:"👸", rating:4.8, reviews:175, address:"430 Monivong Blvd, Tonle Bassac, Chamkarmon, Phnom Penh", hours:"9:00 AM – 7:00 PM", tags:["Blowout","Extensions","Keratin"], photos:["👸","💁","💎"],
     services:[
       {id:"s16",name:"Blowout",duration:"45 min",price:55,tags:["Blowout","45 min","Styling"]},
       {id:"s17",name:"Keratin Treatment",duration:"180 min",price:200,tags:["Keratin","3 hrs","Smoothing"]},
@@ -1517,14 +1517,14 @@ const SALONS = [
     ],
     reviewsList:[{name:"Chloe M.",rating:5,text:"The keratin treatment was amazing! My hair has never been so smooth.",date:"Mar 2025"}]
   },
-  { id:7, name:"The Color Bar", emoji:"🎨", rating:4.5, reviews:143, address:"289 St 289, Boeung Salang, Toul Kork, Phnom Penh", hours:"10:00 AM – 7:00 PM", tags:["Coloring","Balayage","Highlights"], photos:["🎨","🌈","✂️"],
+  { id:7, name:"Sreyneang Salon", emoji:"🎨", rating:4.5, reviews:143, address:"289 St 289, Boeung Salang, Toul Kork, Phnom Penh", hours:"10:00 AM – 7:00 PM", tags:["Coloring","Balayage","Highlights"], photos:["🎨","🌈","✂️"],
     services:[
       {id:"s19",name:"Balayage",duration:"180 min",price:180,tags:["Color","3 hrs","Specialty"]},
       {id:"s20",name:"Full Highlights",duration:"120 min",price:130,tags:["Highlights","2 hrs","Color"]},
     ],
     reviewsList:[{name:"Alex P.",rating:4,text:"Great balayage result! The stylist really understood what I wanted.",date:"Apr 2025"}]
   },
-  { id:8, name:"Nails & Beyond", emoji:"💅", rating:4.7, reviews:211, address:"63 St 63, Boeung Trabek, Chamkarmon, Phnom Penh", hours:"9:30 AM – 8:30 PM", tags:["Nails","Gel","Acrylic"], photos:["💅","💎","✨"],
+  { id:8, name:"Maple Salon Wat Toul", emoji:"💅", rating:4.7, reviews:211, address:"63 St 63, Boeung Trabek, Chamkarmon, Phnom Penh", hours:"9:30 AM – 8:30 PM", tags:["Nails","Gel","Acrylic"], photos:["💅","💎","✨"],
     services:[
       {id:"s21",name:"Acrylic Full Set",duration:"90 min",price:65,tags:["Acrylic","90 min","Full Set"]},
       {id:"s22",name:"Nail Art",duration:"60 min",price:45,tags:["Art","60 min","Custom"]},
